@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="colorNavIcon">#dae9f6</color>
+    <color name="colorNavText">#01294b</color>
+    <color name="colorMain">#FFFDEB</color>
+    <color name="colorForSmallCategories">#C0DA77</color>
+    <color name="textColor">#323135</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="inactiveButton">#D8D8D8</color>
+    <color name="colorOrange">#F78D3C</color>
+    <color name="colorInactiveButton">#A49C96</color>
+</resources>
