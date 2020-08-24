@@ -12,4 +12,6 @@
     <color name="inactiveButton">#D8D8D8</color>
     <color name="colorOrange">#F78D3C</color>
     <color name="colorInactiveButton">#A49C96</color>
+    <color name="colorSelected">#62666D</color>
+    <color name="colorUnSelected">#C4C4C4</color>
 </resources>

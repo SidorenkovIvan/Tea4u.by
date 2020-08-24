@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:orientation="vertical"
-    tools:context=".ui.Search.Search">
+    tools:context="ru.SidorenkovIvan.MyApplication.ui.Search.Search">
 
     <SearchView
         android:id="@+id/searchView"
@@ -15,6 +15,7 @@
         android:layout_marginTop="12dp"
         android:inputType="text"
         android:iconifiedByDefault="false"
+        android:queryBackground="@null"
         android:background="@drawable/searchview_background"
         android:searchIcon="@drawable/icon_search"
         android:queryHint="Введите название или код"/>

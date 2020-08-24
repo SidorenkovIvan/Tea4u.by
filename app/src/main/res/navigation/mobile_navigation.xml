@@ -7,27 +7,27 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.example.MyApplication.ui.home.HomeFragment"
+        android:name="ru.SidorenkovIvan.MyApplication.ui.home.HomeFragment"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/catalog"
-        android:name="com.example.MyApplication.ui.Catalog.Catalog"
+        android:name="ru.SidorenkovIvan.MyApplication.ui.Catalog.Catalog"
         tools:layout="@layout/catalog_fragment" />
 
     <fragment
         android:id="@+id/search"
-        android:name="com.example.MyApplication.ui.Search.Search"
+        android:name="ru.SidorenkovIvan.MyApplication.ui.Search.Search"
         tools:layout="@layout/search_fragment" />
 
     <fragment
         android:id="@+id/categories"
-        android:name="com.example.MyApplication.ui.Categories.Categories"
+        android:name="ru.SidorenkovIvan.MyApplication.ui.Categories.Categories"
         tools:layout="@layout/categories_fragment" />
 
     <fragment
         android:id="@+id/pageOfProduct"
-        android:name="com.example.MyApplication.ui.PageOfProduct.PageOfProduct"
+        android:name="ru.SidorenkovIvan.MyApplication.ui.PageOfProduct.PageOfProduct"
         tools:layout="@layout/page_of_product_fragment" />
 
 </navigation>

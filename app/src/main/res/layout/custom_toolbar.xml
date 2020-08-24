@@ -10,25 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/buttonInstagram"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:background="@drawable/instagram"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/buttonVK"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_marginStart="7dp"
-            android:background="@drawable/vk"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/buttonInstagram"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="230dp"
@@ -44,10 +25,11 @@
 
         <Button
             android:id="@+id/button_call"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginEnd="25dp"
             android:background="@drawable/phone_call"
+            android:stateListAnimator="@null"
             android:gravity="end"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

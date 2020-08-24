@@ -4,7 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    >
+    android:background="@drawable/phone_call_background">
 
     <Button
         android:id="@+id/button_input_back"
@@ -58,7 +58,6 @@
         android:lineSpacingExtra="4sp"
         android:paddingHorizontal="44dp"
         android:text="Ок"
-        android:textAllCaps="false"
         android:textColor="@color/textColor"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"

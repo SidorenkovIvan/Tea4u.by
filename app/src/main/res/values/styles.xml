@@ -9,7 +9,7 @@
     <style name="AppThemeWithNoAcBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorMain</item>
         <item name="colorPrimaryDark">#000000</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorForSmallCategories</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -23,6 +23,10 @@
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+
+    <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert" >
+        <item name="android:windowBackground">@drawable/phone_call_background</item>
     </style>
 
 </resources>
