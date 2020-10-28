@@ -103,12 +103,13 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="todo">TODO</string>
-    <string name="mtc_call">+375 29 239-111-9</string>
-    <string name="viber_call">+375 33 654-97-38</string>
+    <string name="mtc_call">+375 29 239–111–9</string>
+    <string name="viber_call">+375 33 654–97–38</string>
     <string name="back_call">Заказать обратный звонок</string>
     <string name="phone_call_back">Обратный звонок</string>
     <string name="send">Отправить</string>
     <string name="product">Product</string>
     <string name="instagram">tea4u.by</string>
     <string name="vk">Чай для Тебя</string>
+    <string name="downloading_new_teas">Загружаем новые чаи…</string>
 </resources>

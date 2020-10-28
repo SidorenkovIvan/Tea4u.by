@@ -25,6 +25,7 @@ import ru.SidorenkovIvan.MyApplication.R;
 import ru.SidorenkovIvan.MyApplication.ui.Categories.Categories;
 import ru.SidorenkovIvan.MyApplication.ui.PageOfProduct.PageOfProduct;
 import java.util.ArrayList;
+import java.util.Objects;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -36,8 +37,6 @@ import androidx.lifecycle.ViewModelProviders;
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "MyApp";
-    private HomeViewModel homeViewModel;
-    private Button button1;
     private ScrollView scrollView;
     private LinearLayout linearLayoutForAll;
     private static final String DBname = "data.sqlite";
@@ -50,8 +49,8 @@ public class HomeFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         HorizontalScrollView horizontalScrollView = new HorizontalScrollView(getContext());
         horizontalScrollView.setBackgroundColor(Color.WHITE);
-        Typeface typeface = ResourcesCompat.getFont(getActivity(), R.font.opensans);
-        int textColor = ContextCompat.getColor(getActivity(), R.color.textColor);
+        Typeface typeface = ResourcesCompat.getFont(requireActivity(), R.font.opensans);
+        int textColor = ContextCompat.getColor(requireActivity(), R.color.textColor);
 
         scrollView = new ScrollView(getContext());
         scrollView.setBackgroundColor(Color.WHITE);
@@ -73,10 +72,11 @@ public class HomeFragment extends Fragment {
 
         //Categories buttons
         findCategoriesId();
+
         LinearLayout linearLayoutForSmallCategories = new LinearLayout(getContext());
         linearLayoutForSmallCategories.setPadding(30, 60, 20 , 20);
         for (byte i = 0; i < categoryID.size(); i++) {
-            button1 = new Button(getContext());
+            Button button1 = new Button(getContext());
             button1.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             button1.setTextSize(14);
             button1.setTextColor(textColor);
@@ -93,7 +93,7 @@ public class HomeFragment extends Fragment {
                 bundle.putString("categoryTitle", categoryTitle.get(finalI));
                 categories.setArguments(bundle);
                 FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.nav_host_fragment, categories).addToBackStack(null).commit();
+                Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, categories).addToBackStack(null).commit();
             });
             linearLayoutForSmallCategories.addView(button1, layoutParamsForButtons);
         }
@@ -125,7 +125,7 @@ public class HomeFragment extends Fragment {
         categoryID.clear();
         categoryTitle.clear();
         newProductID.clear();
-        String dbPath = getContext().getApplicationInfo().dataDir + "/" + DBname;
+        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
         Cursor query = db.rawQuery("SELECT DISTINCT category.category_id, category.title FROM category INNER JOIN category_product ON category_product.category_id = category.category_id", null);
         query.moveToFirst();
@@ -140,7 +140,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void findLatestProductsId() {
-        String dbPath = getContext().getApplicationInfo().dataDir + "/" + DBname;
+        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
         Cursor query = db.rawQuery("SELECT * FROM product INNER JOIN latest ON product.product_id = latest.product_id", null);
         query.moveToFirst();
@@ -154,7 +154,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void findProductParams() {
-        String dbPath = getContext().getApplicationInfo().dataDir + "/" + DBname;
+        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
         for (byte i = 0; i < newProductID.size(); i++) {
             if (ForCache.getTitleFromMemoryCache(newProductID.get(i)) == null) {
@@ -182,8 +182,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void makeMainLayout() {
-        Typeface typeface = ResourcesCompat.getFont(getContext(), R.font.opensans);
-        int textColor = ContextCompat.getColor(getContext(), R.color.textColor);
+        Typeface typeface = ResourcesCompat.getFont(requireContext(), R.font.opensans);
+        int textColor = ContextCompat.getColor(requireContext(), R.color.textColor);
         for (byte i = 0; i < newProductID.size(); i++) {
             final LinearLayout linearLayoutForImageButtons = new LinearLayout(getContext());
             final LinearLayout linearLayoutForTextViews = new LinearLayout(getContext());
@@ -209,7 +209,7 @@ public class HomeFragment extends Fragment {
                     bundle.putString("productID", newProductID.get(finalI));
                     pageOfProduct.setArguments(bundle);
                     FragmentManager fragmentManager = getFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
+                    Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
                 });
             });
             textView.post(() -> textView.setText(ForCache.getTitleFromMemoryCache(newProductID.get(finalI))));
@@ -239,7 +239,7 @@ public class HomeFragment extends Fragment {
                         bundle.putString("productID", newProductID.get(finalI_1));
                         pageOfProduct.setArguments(bundle);
                         FragmentManager fragmentManager = getFragmentManager();
-                        fragmentManager.beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
+                        Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
                     });
                 });
                 textView_1.post(() -> textView_1.setText(ForCache.getTitleFromMemoryCache(newProductID.get(finalI_1))));
@@ -247,8 +247,6 @@ public class HomeFragment extends Fragment {
                 linearLayoutForImageButtons.post(() -> linearLayoutForImageButtons.addView(imageButton_1, layoutParamsForImageButtons));
                 linearLayoutForTextViews.post(() -> linearLayoutForTextViews.addView(textView, layoutParamsForTextViews));
                 linearLayoutForTextViews.post(() -> linearLayoutForTextViews.addView(textView_1, layoutParamsForTextViews));
-                linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForImageButtons));
-                linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForTextViews));
             } else {
                 Space space = new Space(getContext());
                 Space space_1 = new Space(getContext());
@@ -256,9 +254,9 @@ public class HomeFragment extends Fragment {
                 linearLayoutForImageButtons.post(() -> linearLayoutForImageButtons.addView(space, layoutParamsForImageButtons));
                 linearLayoutForTextViews.post(() -> linearLayoutForTextViews.addView(textView, layoutParamsForTextViews));
                 linearLayoutForTextViews.post(() -> linearLayoutForTextViews.addView(space_1, layoutParamsForTextViews));
-                linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForImageButtons));
-                linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForTextViews));
             }
+            linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForImageButtons));
+            linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForTextViews));
         }
         scrollView.post(() -> scrollView.addView(linearLayoutForAll));
     }
@@ -281,7 +279,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+        ViewModelProviders.of(this).get(HomeViewModel.class);
         // TODO: Use the ViewModel
     }
 }

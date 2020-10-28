@@ -1,5 +1,6 @@
 package ru.SidorenkovIvan.MyApplication.ui.PageOfProduct;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -21,25 +22,25 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import ru.SidorenkovIvan.MyApplication.ForCache;
-import ru.SidorenkovIvan.MyApplication.R;
-import ru.SidorenkovIvan.MyApplication.ViewPagerAdapter;
 import com.rd.PageIndicatorView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Objects;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import ru.SidorenkovIvan.MyApplication.ForCache;
+import ru.SidorenkovIvan.MyApplication.R;
+import ru.SidorenkovIvan.MyApplication.ViewPagerAdapter;
 
 public class PageOfProduct extends Fragment {
 
-    private PageOfProductViewModel mViewModel;
     private static final String TAG = "MyApp";
     private static final String DBname = "data.sqlite";
     private String ID;
@@ -52,6 +53,7 @@ public class PageOfProduct extends Fragment {
     private ArrayList<Bitmap> productImages = new ArrayList<>();
     private ArrayList<Bitmap> bitmapOfImages = new ArrayList<>();
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -61,117 +63,116 @@ public class PageOfProduct extends Fragment {
         StrictMode.setThreadPolicy(policy);
 
         new Thread(() -> {
+            Bundle bundle = getArguments();
+            ID = (String) Objects.requireNonNull(bundle).get("productID");
 
-        Bundle bundle = getArguments();
-        ID = (String) bundle.get("productID");
+            findProductParams();
 
-        findProductParams();
+            //TextView with title and code
+            TextView textViewTitle = view.findViewById(R.id.textViewTitle);
+            textViewTitle.post(() -> textViewTitle.setText(productTitle + "  (" + code + ")"));
 
-        //TextView with title and code
-        TextView textViewTitle = view.findViewById(R.id.textViewTitle);
-        textViewTitle.post(() -> textViewTitle.setText(productTitle + "  (" + code + ")"));
+            //Check for connection and choosing between image of database and images from site
+            if (connected()) {
+                //Big images from site
+                if (ForCache.getLargeImagesFromMemoryCache(ID) == null) {
+                    largeImages();
+                }
 
-        //Check for connection and choosing between image of database and images from site
-        if (connected()) {
-            //Big images from site
-            if (ForCache.getLargeImagesFromMemoryCache(ID) == null) {
-                largeImages();
+                //View pager
+                ViewPager viewPager = view.findViewById(R.id.viewPager);
+                ViewTreeObserver viewTreeObserver = viewPager.getViewTreeObserver();
+                viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT);
+                        int viewPagerWidth = viewPager.getWidth();
+                        float viewPagerHeight = (float) (viewPagerWidth);
+                        layoutParams.width = viewPagerWidth;
+                        layoutParams.height = (int) viewPagerHeight;
+                        viewPager.setLayoutParams(layoutParams);
+                        viewPager.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    }
+                });
+                PagerAdapter adapter = new ViewPagerAdapter(getContext(), ForCache.getLargeImagesFromMemoryCache(ID));
+                viewPager.post(() -> viewPager.setAdapter(adapter));
+                //Indicator for view pager
+                PageIndicatorView pageIndicatorView = view.findViewById(R.id.viewPagerIndicator);
+                pageIndicatorView.post(() -> pageIndicatorView.setViewPager(viewPager));
+                pageIndicatorView.post(() -> pageIndicatorView.setCount(ForCache.getLargeImagesFromMemoryCache(ID).size()));
+                viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    }
+
+                    @Override
+                    public void onPageSelected(int position) {
+                        pageIndicatorView.setSelection(position);
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
+                    }
+                });
+            } else { //Image from database
+                //View pager
+                ViewPager viewPager = view.findViewById(R.id.viewPager);
+                ViewTreeObserver viewTreeObserver = viewPager.getViewTreeObserver();
+                viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT);
+                        int viewPagerWidth = viewPager.getWidth();
+                        float viewPagerHeight = (float) (viewPagerWidth);
+                        layoutParams.width = viewPagerWidth;
+                        layoutParams.height = (int) viewPagerHeight;
+                        viewPager.setLayoutParams(layoutParams);
+                        viewPager.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    }
+                });
+                PagerAdapter adapter = new ViewPagerAdapter(getContext(), productImages);
+                viewPager.post(() -> viewPager.setAdapter(adapter));
+                //Indicator for view pager
+                PageIndicatorView pageIndicatorView = view.findViewById(R.id.viewPagerIndicator);
+                pageIndicatorView.post(() -> pageIndicatorView.setViewPager(viewPager));
+                pageIndicatorView.post(() -> pageIndicatorView.setCount(productImages.size()));
+                viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    }
+
+                    @Override
+                    public void onPageSelected(int position) {
+                        pageIndicatorView.setSelection(position);
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
+                    }
+                });
             }
 
-            //View pager
-            ViewPager viewPager = view.findViewById(R.id.viewPager);
-            ViewTreeObserver viewTreeObserver = viewPager.getViewTreeObserver();
-            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-                    int viewPagerWidth = viewPager.getWidth();
-                    float viewPagerHeight = (float) (viewPagerWidth);
-                    layoutParams.width = viewPagerWidth;
-                    layoutParams.height = (int) viewPagerHeight;
-                    viewPager.setLayoutParams(layoutParams);
-                    viewPager.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                }
-            });
-            PagerAdapter adapter = new ViewPagerAdapter(getContext(), ForCache.getLargeImagesFromMemoryCache(ID));
-            viewPager.post(() -> viewPager.setAdapter(adapter));
-            //Indicator for view pager
-            PageIndicatorView pageIndicatorView = view.findViewById(R.id.viewPagerIndicator);
-            pageIndicatorView.post(() -> pageIndicatorView.setViewPager(viewPager));
-            pageIndicatorView.post(() -> pageIndicatorView.setCount(ForCache.getLargeImagesFromMemoryCache(ID).size()));
-            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                }
+            //TextView with description
+            TextView textViewDescription = view.findViewById(R.id.textViewDescription);
+            textViewDescription.post(() -> textViewDescription.setText(description));
 
-                @Override
-                public void onPageSelected(int position) {
-                    pageIndicatorView.setSelection(position);
-                }
+            //Output of price and button to go to the site
+            Button button = view.findViewById(R.id.buttonToSite);
+            button.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(productUrl))));
 
-                @Override
-                public void onPageScrollStateChanged(int state) {
-                }
-            });
-        } else { //Image from database
-            //View pager
-            ViewPager viewPager = view.findViewById(R.id.viewPager);
-            ViewTreeObserver viewTreeObserver = viewPager.getViewTreeObserver();
-            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-                    int viewPagerWidth = viewPager.getWidth();
-                    float viewPagerHeight = (float) (viewPagerWidth);
-                    layoutParams.width = viewPagerWidth;
-                    layoutParams.height = (int) viewPagerHeight;
-                    viewPager.setLayoutParams(layoutParams);
-                    viewPager.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                }
-            });
-            PagerAdapter adapter = new ViewPagerAdapter(getContext(), productImages);
-            viewPager.post(() -> viewPager.setAdapter(adapter));
-            //Indicator for view pager
-            PageIndicatorView pageIndicatorView = view.findViewById(R.id.viewPagerIndicator);
-            pageIndicatorView.post(() -> pageIndicatorView.setViewPager(viewPager));
-            pageIndicatorView.post(() -> pageIndicatorView.setCount(productImages.size()));
-            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                }
+            TextView textViewPrice = view.findViewById(R.id.textViewPrice);
+            price = price.replace("{", "");
+            price = price.replace("}", ":\n");
+            price = price.replace("|", "\n");
+            Log.i(TAG, "Price is: " + price);
+            textViewPrice.post(() -> textViewPrice.setText(price));
 
-                @Override
-                public void onPageSelected(int position) {
-                    pageIndicatorView.setSelection(position);
-                }
-
-                @Override
-                public void onPageScrollStateChanged(int state) {
-                }
-            });
-        }
-
-        //TextView with description
-        TextView textViewDescription = view.findViewById(R.id.textViewDescription);
-        textViewDescription.post(() -> textViewDescription.setText(description));
-
-        //Output of price and button to go to the site
-        Button button = view.findViewById(R.id.buttonToSite);
-        button.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(productUrl))));
-
-        TextView textViewPrice = view.findViewById(R.id.textViewPrice);
-        price = price.replace("{", "");
-        price = price.replace("}", ":\n");
-        price = price.replace("|", "\n");
-        Log.i(TAG, "Price is: " + price);
-        textViewPrice.post(() -> textViewPrice.setText(price));
-
-        ScrollView scrollView = view.findViewById(R.id.scrollView2);
-        scrollView.post(() -> scrollView.setVisibility(View.VISIBLE));
+            ScrollView scrollView = view.findViewById(R.id.scrollView2);
+            scrollView.post(() -> scrollView.setVisibility(View.VISIBLE));
 
         }).start();
 
@@ -192,14 +193,22 @@ public class PageOfProduct extends Fragment {
     }
 
     public boolean connected() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;
+        ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            return true;
+        }
+        wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            return true;
+        }
+        wifiInfo = cm.getActiveNetworkInfo();
+        return wifiInfo != null && wifiInfo.isConnected();
     }
 
     private void findProductParams() {
         Bitmap productImage;
-        String dbPath = getContext().getApplicationInfo().dataDir + "/" + DBname;
+        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
         Cursor query = db.rawQuery("SELECT * FROM product WHERE product_id = '" + ID + "'", null);
         query.moveToFirst();
@@ -231,7 +240,7 @@ public class PageOfProduct extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(PageOfProductViewModel.class);
+        ViewModelProviders.of(this).get(PageOfProductViewModel.class);
         // TODO: Use the ViewModel
     }
 }

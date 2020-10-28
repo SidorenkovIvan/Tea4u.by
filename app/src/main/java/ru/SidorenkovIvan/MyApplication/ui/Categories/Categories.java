@@ -16,13 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Space;
 import android.widget.TextView;
-
 import ru.SidorenkovIvan.MyApplication.ForCache;
 import ru.SidorenkovIvan.MyApplication.R;
 import ru.SidorenkovIvan.MyApplication.ui.PageOfProduct.PageOfProduct;
-
 import java.util.ArrayList;
-
+import java.util.Objects;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -33,7 +31,6 @@ import androidx.lifecycle.ViewModelProviders;
 
 public class Categories extends Fragment {
 
-    private CategoriesViewModel mViewModel;
     private static final String DBname = "data.sqlite";
     ArrayList<String> productID = new ArrayList<>();
 
@@ -45,10 +42,10 @@ public class Categories extends Fragment {
         scrollView.setBackgroundColor(Color.WHITE);
 
         Bundle bundle = getArguments();
-        String ID = (String) bundle.get("categoryID");
+        String ID = (String) Objects.requireNonNull(bundle).get("categoryID");
         String categoryTitle = (String) bundle.get("categoryTitle");
         productID.clear();
-        String dbPath = getContext().getApplicationInfo().dataDir + "/" + DBname;
+        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
         getProductsId(ID, dbPath);
         getProductsParams(dbPath);
         makeMainLayout(scrollView, categoryTitle);
@@ -99,8 +96,8 @@ public class Categories extends Fragment {
         LinearLayout linearLayoutForAll = new LinearLayout(getContext());
         linearLayoutForAll.setOrientation(LinearLayout.VERTICAL);
 
-        Typeface typeface = ResourcesCompat.getFont(getContext(), R.font.opensans);
-        int textColor = ContextCompat.getColor(getContext(), R.color.textColor);
+        Typeface typeface = ResourcesCompat.getFont(requireContext(), R.font.opensans);
+        int textColor = ContextCompat.getColor(requireContext(), R.color.textColor);
 
         TextView textViewForCategory = new TextView(getContext());
         textViewForCategory.setPadding(0, 80, 0, 50);
@@ -138,7 +135,7 @@ public class Categories extends Fragment {
                     bundle.putString("productID", productID.get(finalI));
                     pageOfProduct.setArguments(bundle);
                     FragmentManager fragmentManager = getFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
+                    Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
                 });
             });
             textView.post(() -> textView.setText(ForCache.getTitleFromMemoryCache(productID.get(finalI))));
@@ -168,7 +165,7 @@ public class Categories extends Fragment {
                         bundle.putString("productID", productID.get(finalI_1));
                         pageOfProduct.setArguments(bundle);
                         FragmentManager fragmentManager = getFragmentManager();
-                        fragmentManager.beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
+                        Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
                     });
                 });
                 textView_1.post(() -> textView_1.setText(ForCache.getTitleFromMemoryCache(productID.get(finalI_1))));
@@ -176,8 +173,6 @@ public class Categories extends Fragment {
                 linearLayoutForImageButtons.post(() -> linearLayoutForImageButtons.addView(imageButton_1, layoutParamsForImageButtons));
                 linearLayoutForTextViews.post(() -> linearLayoutForTextViews.addView(textView, layoutParamsForTextViews));
                 linearLayoutForTextViews.post(() -> linearLayoutForTextViews.addView(textView_1, layoutParamsForTextViews));
-                linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForImageButtons));
-                linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForTextViews));
             } else {
                 Space space = new Space(getContext());
                 Space space_1 = new Space(getContext());
@@ -185,9 +180,9 @@ public class Categories extends Fragment {
                 linearLayoutForImageButtons.post(() -> linearLayoutForImageButtons.addView(space, layoutParamsForImageButtons));
                 linearLayoutForTextViews.post(() -> linearLayoutForTextViews.addView(textView, layoutParamsForTextViews));
                 linearLayoutForTextViews.post(() -> linearLayoutForTextViews.addView(space_1, layoutParamsForTextViews));
-                linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForImageButtons));
-                linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForTextViews));
             }
+            linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForImageButtons));
+            linearLayoutForAll.post(() -> linearLayoutForAll.addView(linearLayoutForTextViews));
         }
         scrollView.post(scrollView::removeAllViews);
         scrollView.post(() -> scrollView.addView(linearLayoutForAll));
@@ -206,7 +201,7 @@ public class Categories extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(CategoriesViewModel.class);
+        ViewModelProviders.of(this).get(CategoriesViewModel.class);
         // TODO: Use the ViewModel
     }
 

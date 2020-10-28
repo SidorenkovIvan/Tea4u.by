@@ -8,22 +8,44 @@
     <fragment
         android:id="@+id/nav_home"
         android:name="ru.SidorenkovIvan.MyApplication.ui.home.HomeFragment"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_search"
+            app:destination="@id/search" />
+        <action
+            android:id="@+id/action_nav_home_to_catalog"
+            app:destination="@id/catalog" />
+        <action
+            android:id="@+id/action_nav_home_to_categories"
+            app:destination="@id/categories" />
+    </fragment>
 
     <fragment
         android:id="@+id/catalog"
         android:name="ru.SidorenkovIvan.MyApplication.ui.Catalog.Catalog"
-        tools:layout="@layout/catalog_fragment" />
+        tools:layout="@layout/catalog_fragment" >
+        <action
+            android:id="@+id/action_catalog_to_categories"
+            app:destination="@id/categories" />
+    </fragment>
 
     <fragment
         android:id="@+id/search"
         android:name="ru.SidorenkovIvan.MyApplication.ui.Search.Search"
-        tools:layout="@layout/search_fragment" />
+        tools:layout="@layout/search_fragment" >
+        <action
+            android:id="@+id/action_search_to_pageOfProduct"
+            app:destination="@id/pageOfProduct" />
+    </fragment>
 
     <fragment
         android:id="@+id/categories"
         android:name="ru.SidorenkovIvan.MyApplication.ui.Categories.Categories"
-        tools:layout="@layout/categories_fragment" />
+        tools:layout="@layout/categories_fragment" >
+        <action
+            android:id="@+id/action_categories_to_pageOfProduct"
+            app:destination="@id/pageOfProduct" />
+    </fragment>
 
     <fragment
         android:id="@+id/pageOfProduct"

@@ -2,8 +2,10 @@
   <dictionary name="Ivan">
     <words>
       <w>aromat</w>
+      <w>attacher</w>
       <w>bname</w>
       <w>cardview</w>
+      <w>efﬁcient</w>
       <w>gaba</w>
       <w>instagram</w>
       <w>matcha</w>
@@ -12,9 +14,12 @@
       <w>searchview</w>
       <w>shen</w>
       <w>sidorenkov</w>
+      <w>snackbar</w>
       <w>sqlite</w>
+      <w>supercede</w>
       <w>ulun</w>
       <w>viber</w>
+      <w>waypoints</w>
     </words>
   </dictionary>
 </component>

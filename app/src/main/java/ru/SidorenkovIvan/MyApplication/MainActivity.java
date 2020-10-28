@@ -12,12 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import ru.SidorenkovIvan.MyApplication.R;
-
-import ru.SidorenkovIvan.MyApplication.ui.Catalog.Catalog;
-import ru.SidorenkovIvan.MyApplication.ui.Search.Search;
-import ru.SidorenkovIvan.MyApplication.ui.home.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,7 +19,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
+import ru.SidorenkovIvan.MyApplication.ui.Catalog.Catalog;
+import ru.SidorenkovIvan.MyApplication.ui.Search.Search;
+import ru.SidorenkovIvan.MyApplication.ui.home.HomeFragment;
 import static androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private String phone;
     private BottomNavigationView navigationView;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

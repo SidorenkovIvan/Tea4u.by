@@ -1,5 +1,6 @@
 package ru.SidorenkovIvan.MyApplication;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -15,8 +16,8 @@ import javax.mail.internet.MimeMessage;
 
 class JavaMailAPI extends AsyncTask<Void,Void,Void>  {
     //Variables
+    @SuppressLint("StaticFieldLeak")
     private Context mContext;
-    private Session mSession;
 
     private String mEmail;
     private String mSubject;
@@ -62,7 +63,8 @@ class JavaMailAPI extends AsyncTask<Void,Void,Void>  {
         props.put("mail.smtp.port", "465");
 
         //Creating a new session
-        mSession = Session.getDefaultInstance(props,
+        //Authenticating the password
+        Session mSession = Session.getDefaultInstance(props,
                 new javax.mail.Authenticator() {
                     //Authenticating the password
                     protected PasswordAuthentication getPasswordAuthentication() {
@@ -84,26 +86,6 @@ class JavaMailAPI extends AsyncTask<Void,Void,Void>  {
             mm.setText(mMessage);
             //Sending email
             Transport.send(mm);
-
-//            BodyPart messageBodyPart = new MimeBodyPart();
-//
-//            messageBodyPart.setText(message);
-//
-//            Multipart multipart = new MimeMultipart();
-//
-//            multipart.addBodyPart(messageBodyPart);
-//
-//            messageBodyPart = new MimeBodyPart();
-//
-//            DataSource source = new FileDataSource(filePath);
-//
-//            messageBodyPart.setDataHandler(new DataHandler(source));
-//
-//            messageBodyPart.setFileName(filePath);
-//
-//            multipart.addBodyPart(messageBodyPart);
-
-//            mm.setContent(multipart);
 
         } catch (MessagingException e) {
             e.printStackTrace();

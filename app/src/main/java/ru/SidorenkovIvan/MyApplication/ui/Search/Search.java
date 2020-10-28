@@ -2,7 +2,6 @@ package ru.SidorenkovIvan.MyApplication.ui.Search;
 
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
-
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -17,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
-
+import java.util.Objects;
 import ru.SidorenkovIvan.MyApplication.R;
 import ru.SidorenkovIvan.MyApplication.ui.PageOfProduct.PageOfProduct;
 import androidx.annotation.NonNull;
@@ -27,18 +26,16 @@ import androidx.lifecycle.ViewModelProviders;
 
 public class Search extends Fragment {
 
-    private SearchViewModel mViewModel;
     private static final String TAG = "MyApp";
     private static final String DBname = "data.sqlite";
     private ScrollView scrollView;
-    private SearchView searchView;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view =inflater.inflate(R.layout.search_fragment, container, false);
 
-        searchView = view.findViewById(R.id.searchView);
+        SearchView searchView = view.findViewById(R.id.searchView);
         scrollView = view.findViewById(R.id.scrollView);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -60,8 +57,8 @@ public class Search extends Fragment {
     }
 
     private void search(String keyword) {
-        Typeface typeface = ResourcesCompat.getFont(getContext(), R.font.opensans);
-        String dbPath = getContext().getApplicationInfo().dataDir + "/" + DBname;
+        Typeface typeface = ResourcesCompat.getFont(requireContext(), R.font.opensans);
+        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
         Cursor cursor = db.rawQuery("SELECT * FROM product WHERE productTitle like ?", new String[]{"%" + keyword + "%"});
         Cursor cursor1 = db.rawQuery("SELECT * FROM product WHERE code like ?", new String[]{"%" + keyword + "%"});
@@ -88,7 +85,7 @@ public class Search extends Fragment {
                     bundle.putString("productID", product.getId());
                     pageOfProduct.setArguments(bundle);
                     FragmentManager fragmentManager = getFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
+                    Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
                 });
                 linearLayout.post(() -> linearLayout.addView(button));
             } while (cursor.moveToNext());
@@ -117,7 +114,7 @@ public class Search extends Fragment {
                     bundle.putString("productID", product.getId());
                     pageOfProduct.setArguments(bundle);
                     FragmentManager fragmentManager = getFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
+                    Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
                 });
                 linearLayout.post(() -> linearLayout.addView(button));
             } while (cursor1.moveToNext());
@@ -146,7 +143,7 @@ public class Search extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(SearchViewModel.class);
+        ViewModelProviders.of(this).get(SearchViewModel.class);
         // TODO: Use the ViewModel
     }
 }

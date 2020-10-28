@@ -6,81 +6,114 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity {
+
     private static final String DBname = "data.sqlite";
     private static final String TAG = "MyApp";
+    private ProgressBar progressBar;
+    private String[] teaTitles = {"Завариваем чай...", "Чайник кипит...", "Загружаем новые чаи...",
+            "Переходим на чайную сторону...", "Готовим чайную церемонию...", "Собираем чай для Вас...",
+            "Промываем заварник...", "Выбираем чашку...", "Покупаем сладости к чаю..."};
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
+
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        new Thread(() -> {
-            workWithDatabase();
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            startNextActivity();
-        }).start();
+        progressBar = findViewById(R.id.progressBarSplash);
+
+        TextView textViewForProgressBar = findViewById(R.id.textViewForProgressBar);
+        int random = new Random().nextInt(9);
+        textViewForProgressBar.setText(teaTitles[random]);
+
+        new Thread(this::workWithDatabase).start();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     private void workWithDatabase() {
         String dbPath = getApplicationInfo().dataDir + "/" + DBname;
         File dbFile = new File(dbPath);
 
-        CompletableFuture<String> remoteHash = CompletableFuture.supplyAsync(this::getRemoteHash);
-        CompletableFuture<String> localHash = CompletableFuture.supplyAsync(this::getLocalHash);
+        Log.i(TAG, String.valueOf(dbFile.length()));
 
         try {
             if (connected()) {
-                if (!dbFile.exists() || !remoteHash.get().equals(localHash.get())) {
+                if (!dbFile.exists()) {
+                    Log.i(TAG, "Saving database");
+                    saveDatabase();
+                } else if (dbFile.exists() && dbFile.length() < 3000000) {
                     deleteDatabase();
                     Log.i(TAG, "Saving database");
                     saveDatabase();
-                } else Log.i(TAG, "Database is correct on ur phone");
-            } else if (!dbFile.exists()) Log.i(TAG, "Fail, u have no database for app");
-            else Log.i(TAG, "U used old database");
+                } else if (dbFile.exists()) {
+                    CompletableFuture<String> remoteHash = CompletableFuture.supplyAsync(this::getRemoteHash);
+                    CompletableFuture<String> localHash = CompletableFuture.supplyAsync(this::getLocalHash);
+
+                    if (!remoteHash.get().equals(localHash.get())) {
+                        deleteDatabase();
+                        Log.i(TAG, "Saving new database");
+                        saveDatabase();
+                    } else {
+                        progressBar.setMax(100);
+                        progressBar.setProgress(100);
+                        Log.i(TAG, "Database is correct on ur phone");
+                    }
+                }
+                startNextActivity();
+            } else if (!dbFile.exists()) {
+                Log.i(TAG, "Fail, u have no database for app");
+            } else {
+                Log.i(TAG, "U used old database");
+                startNextActivity();
+            }
         } catch (InterruptedException | ExecutionException ignored) {
         }
     }
 
-    private void startNextActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+    private void startNextActivity() throws InterruptedException {
+        Thread.sleep(1500);
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
         finish();
         Log.i(TAG, "Go to main page");
     }
 
-    private boolean connected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        return cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;
+    public boolean connected() {
+        ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            return true;
+        }
+        wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            return true;
+        }
+        return wifiInfo != null && wifiInfo.isConnected();
     }
 
     private String getLocalHash() {
@@ -124,9 +157,27 @@ public class SplashActivity extends AppCompatActivity {
         try {
             String dbPath = getApplicationInfo().dataDir + "/" + DBname;
             URL url = new URL(getString(R.string.download_database_API));
-            File f = new File(dbPath);
-            if (!f.isFile()) {
-                FileUtils.copyURLToFile(url, f);
+            URLConnection connection = url.openConnection();
+            connection.connect();
+
+            int fileLength = connection.getContentLength();
+            fileLength *= -1;
+            Log.i("Length", String.valueOf(fileLength));
+
+            try (BufferedInputStream inputStream = new BufferedInputStream(new URL(getString(R.string.download_database_API)).openStream());
+                 FileOutputStream fileOS = new FileOutputStream(dbPath)) {
+                byte[] data = new byte[1024];
+                long total = 0;
+                int byteContent;
+                progressBar.setMax(333800000);
+                while ((byteContent = inputStream.read(data, 0, 1024)) != -1) {
+                    total += byteContent;
+                    Log.i(TAG, String.valueOf((int) (total * 100 / fileLength)));
+                    progressBar.setProgress((int) (total * 100 / fileLength));
+                    fileOS.write(data, 0, byteContent);
+                }
+            } catch (IOException ignored) {
+
             }
         } catch (IOException e) {
             Log.i(TAG, "Something wrong with saving database");
