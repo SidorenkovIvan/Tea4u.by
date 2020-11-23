@@ -11,6 +11,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import ru.SidorenkovIvan.MyApplication.CatalogAdapter;
 import ru.SidorenkovIvan.MyApplication.R;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -29,52 +33,20 @@ public class Catalog extends Fragment {
     private ArrayList<String> categoryID = new ArrayList<>();
     private ArrayList<String> categoryTitle = new ArrayList<>();
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Typeface typeface = ResourcesCompat.getFont(requireContext(), R.font.opensans);
-        int textColor = ContextCompat.getColor(requireContext(), R.color.textColor);
+        View view = inflater.inflate(R.layout.catalog_fragment, container, false);
 
-        ScrollView scrollView = new ScrollView(getContext());
-        scrollView.setBackgroundColor(Color.WHITE);
-        LinearLayout linearLayoutForAll = new LinearLayout(getActivity());
-        linearLayoutForAll.setOrientation(LinearLayout.VERTICAL);
-
-        //Params for Buttons
-        layoutParamsForButtons.setMargins(0, 20, 0, 0);
-
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        FragmentManager fragmentManager = getFragmentManager();
         findCategoriesIdTit();
 
-        for (byte i = 0; i < categoryID.size(); i++) {
-            Button button = new Button(getContext());
-            button.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-            button.setTextSize(16);
-            button.setBackgroundColor(Color.WHITE);
-            button.setTextColor(textColor);
-            button.setTypeface(typeface);
-            button.setText(categoryTitle.get(i));
-            button.setAllCaps(false);
-            button.setStateListAnimator(null);
-            button.setPadding(80, 0, 80, 0);
+        CatalogAdapter catalogAdapter = new CatalogAdapter(fragmentManager, categoryID, categoryTitle);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(catalogAdapter);
 
-            byte finalI = i;
-            button.setOnClickListener(v -> {
-                Categories categories = new Categories();
-                Bundle bundle = new Bundle();
-                bundle.putString("categoryID", categoryID.get(finalI));
-                bundle.putString("categoryTitle", categoryTitle.get(finalI));
-                categories.setArguments(bundle);
-                FragmentManager fragmentManager = getFragmentManager();
-                Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, categories).addToBackStack(null).commit();
-            });
-
-            linearLayoutForAll.addView(button, layoutParamsForButtons);
-        }
-
-        scrollView.addView(linearLayoutForAll);
-
-        return scrollView;
+        return view;
     }
 
     private void findCategoriesIdTit() {
@@ -92,12 +64,6 @@ public class Catalog extends Fragment {
         query.close();
         db.close();
     }
-
-    private final LinearLayout.LayoutParams layoutParamsForButtons = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            1
-    );
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
