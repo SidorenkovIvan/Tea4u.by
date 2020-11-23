@@ -6,18 +6,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ru.SidorenkovIvan.MyApplication.ui.Categories.Categories;
 
 public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.ViewHolder> {
 
-    private final ArrayList<String> categoryID;
-    private final ArrayList<String> categoryTitle;
+    private List<CategoriesIdAndTitles> mCategoriesIdAndTitles;
     FragmentManager fragmentManager;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -28,15 +25,15 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.ViewHold
             catalogButton = (Button) itemView.findViewById(R.id.catalogButton);
         }
     }
+
     @Override
     public int getItemViewType(final int position) {
         return R.layout.item_catalog;
     }
 
-    public CatalogAdapter(FragmentManager manager, ArrayList<String> catId, ArrayList<String> catTit) {
+    public CatalogAdapter(FragmentManager manager, List<CategoriesIdAndTitles> categoriesIdAndTitles) {
         fragmentManager = manager;
-        categoryID = catId;
-        categoryTitle = catTit;
+        mCategoriesIdAndTitles = categoriesIdAndTitles;
     }
 
     @Override
@@ -52,14 +49,17 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(CatalogAdapter.ViewHolder holder, int position) {
+        CategoriesIdAndTitles categoriesIdAndTitles = mCategoriesIdAndTitles.get(position);
+        String title = categoriesIdAndTitles.getTitle();
+
         Button button = holder.catalogButton;
-        button.setText(categoryTitle.get(position));
+        button.setText(title);
 
         button.setOnClickListener(v -> {
             Categories categories = new Categories();
             Bundle bundle = new Bundle();
-            bundle.putString("categoryID", categoryID.get(position));
-            bundle.putString("categoryTitle", categoryTitle.get(position));
+            bundle.putString("categoryID", categoriesIdAndTitles.getId());
+            bundle.putString("categoryTitle", title);
             categories.setArguments(bundle);
             Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, categories).addToBackStack(null).commit();
         });
@@ -68,6 +68,6 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return categoryID.size();
+        return mCategoriesIdAndTitles.size();
     }
 }

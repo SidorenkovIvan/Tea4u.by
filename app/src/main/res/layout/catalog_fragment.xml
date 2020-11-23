@@ -3,7 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="ru.SidorenkovIvan.MyApplication.ui.Catalog.Catalog">
+
+    <Button
+        android:id="@+id/button_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="update"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
