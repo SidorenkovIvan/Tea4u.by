@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        setSupportActionBar((Toolbar)findViewById(R.id.custom_toolbar));
+        setSupportActionBar(findViewById(R.id.custom_toolbar));
 
         navigationView = findViewById(R.id.nav_view);
         navigationView.setOnNavigationItemSelectedListener(item -> {

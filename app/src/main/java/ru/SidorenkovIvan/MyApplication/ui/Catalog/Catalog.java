@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+
 import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,15 +13,12 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import ru.SidorenkovIvan.MyApplication.CatalogAdapter;
-import ru.SidorenkovIvan.MyApplication.CategoriesIdAndTitles;
+import ru.SidorenkovIvan.MyApplication.Category;
 import ru.SidorenkovIvan.MyApplication.R;
 
 public class Catalog extends Fragment {
 
     private static final String DBname = "data.sqlite";
-    List<CategoriesIdAndTitles> categoriesIdAndTitles;
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -32,17 +29,11 @@ public class Catalog extends Fragment {
         FragmentManager fragmentManager = getFragmentManager();
 
         String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
-        categoriesIdAndTitles = CategoriesIdAndTitles.findCategoriesIdTit(dbPath);
+        List<Category> category = Category.getNotEmptyCategories(dbPath);
 
-        CatalogAdapter catalogAdapter = new CatalogAdapter(fragmentManager, categoriesIdAndTitles);
+        CatalogAdapter catalogAdapter = new CatalogAdapter(fragmentManager, category);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(catalogAdapter);
-
-        Button button = view.findViewById(R.id.button_update);
-        button.setOnClickListener(v -> {
-            categoriesIdAndTitles.addAll(CategoriesIdAndTitles.findCategoriesIdTit(dbPath));
-            catalogAdapter.notifyDataSetChanged();
-        });
 
         return view;
     }

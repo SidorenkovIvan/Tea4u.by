@@ -67,7 +67,7 @@ public class SplashActivity extends AppCompatActivity {
                 if (!dbFile.exists()) {
                     Log.i(TAG, "Saving database");
                     saveDatabase();
-                } else if (dbFile.exists() && dbFile.length() < 3000000) {
+                } else if (dbFile.exists() && dbFile.length() < 3400000) {
                     deleteDatabase();
                     Log.i(TAG, "Saving database");
                     saveDatabase();
@@ -169,7 +169,7 @@ public class SplashActivity extends AppCompatActivity {
                 byte[] data = new byte[1024];
                 long total = 0;
                 int byteContent;
-                progressBar.setMax(333800000);
+                progressBar.setMax(343800000);
                 while ((byteContent = inputStream.read(data, 0, 1024)) != -1) {
                     total += byteContent;
                     Log.i(TAG, String.valueOf((int) (total * 100 / fileLength)));
