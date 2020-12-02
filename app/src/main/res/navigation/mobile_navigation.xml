@@ -49,7 +49,7 @@
 
     <fragment
         android:id="@+id/pageOfProduct"
-        android:name="ru.SidorenkovIvan.MyApplication.ui.PageOfProduct.PageOfProduct"
-        tools:layout="@layout/page_of_product_fragment" />
+        android:name="ru.SidorenkovIvan.MyApplication.ui.ProductPage.ProductPage"
+        tools:layout="@layout/product_page_fragment" />
 
 </navigation>

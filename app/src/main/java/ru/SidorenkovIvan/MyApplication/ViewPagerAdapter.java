@@ -12,8 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
 public class ViewPagerAdapter extends PagerAdapter {
-    private Context context;
-    private ArrayList<Bitmap> bitmaps;
+    private final Context context;
+    private final ArrayList<Bitmap> bitmaps;
 
     public ViewPagerAdapter(Context context, ArrayList<Bitmap> bitmaps) {
         this.context = context;

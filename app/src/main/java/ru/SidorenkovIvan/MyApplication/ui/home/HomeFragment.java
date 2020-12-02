@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ru.SidorenkovIvan.MyApplication.Category;
+import ru.SidorenkovIvan.MyApplication.DBController;
 import ru.SidorenkovIvan.MyApplication.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,27 +38,27 @@ public class HomeFragment extends Fragment {
         FragmentManager fragmentManager = getFragmentManager();
 
         //Categories buttons
-        RecyclerView recyclerViewSmallCategories = view.findViewById(R.id.recyclerViewSmallCategories);
-        List<Category> categories = Category.getNotEmptyCategories(dbPath);
-        HomeCategoriesAdapter homeCategoriesAdapter = new HomeCategoriesAdapter(fragmentManager, categories);
-        recyclerViewSmallCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        recyclerViewSmallCategories.setAdapter(homeCategoriesAdapter);
+        RecyclerView categoriesView = view.findViewById(R.id.recyclerViewSmallCategories);
+        List<Category> categories = DBController.getNotEmptyCategories(dbPath);
+        HomeCategoriesAdapter catAdapter = new HomeCategoriesAdapter(fragmentManager, categories);
+        categoriesView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        categoriesView.setAdapter(catAdapter);
 
         //Find new products in shop
-        RecyclerView recyclerViewNewProducts = view.findViewById(R.id.recyclerViewNewProducts);
-        List<Product> products = Product.getProducts(dbPath, findLatestProductsId());
-        ProductAdapter productAdapter = new ProductAdapter(fragmentManager, products);
-        recyclerViewNewProducts.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        recyclerViewNewProducts.setAdapter(productAdapter);
+//        RecyclerView productsView = view.findViewById(R.id.recyclerViewNewProducts);
+//        List<Product> products = DBController.getProducts(dbPath, getProductsId());
+//        ProductAdapter productAdapter = new ProductAdapter(fragmentManager, products);
+//        productsView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+//        productsView.setAdapter(productAdapter);
 
         return view;
     }
 
-    private ArrayList<String> findLatestProductsId() {
+    private ArrayList<String> getProductsId() {
         ArrayList<String> newProductsId = new ArrayList<>();
         String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-        Cursor query = db.rawQuery("SELECT * FROM product INNER JOIN latest ON product.product_id = latest.product_id", null);
+        Cursor query = db.rawQuery("SELECT product.product_id FROM product INNER JOIN latest ON product.product_id = latest.product_id", null);
         query.moveToFirst();
         while (!query.isAfterLast()) {
             newProductsId.add(query.getString(0));

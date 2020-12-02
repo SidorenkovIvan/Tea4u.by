@@ -34,9 +34,6 @@ public class SplashActivity extends AppCompatActivity {
     private static final String DBname = "data.sqlite";
     private static final String TAG = "MyApp";
     private ProgressBar progressBar;
-    private String[] teaTitles = {"Завариваем чай...", "Чайник кипит...", "Загружаем новые чаи...",
-            "Переходим на чайную сторону...", "Готовим чайную церемонию...", "Собираем чай для Вас...",
-            "Промываем заварник...", "Выбираем чашку...", "Покупаем сладости к чаю..."};
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,8 +46,10 @@ public class SplashActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBarSplash);
 
         TextView textViewForProgressBar = findViewById(R.id.textViewForProgressBar);
+
+        String[] splashTitles = getResources().getStringArray(R.array.splash_titles);
         int random = new Random().nextInt(9);
-        textViewForProgressBar.setText(teaTitles[random]);
+        textViewForProgressBar.setText(splashTitles[random]);
 
         new Thread(this::workWithDatabase).start();
     }
@@ -176,9 +175,7 @@ public class SplashActivity extends AppCompatActivity {
                     progressBar.setProgress((int) (total * 100 / fileLength));
                     fileOS.write(data, 0, byteContent);
                 }
-            } catch (IOException ignored) {
-
-            }
+            } catch (IOException ignored) {}
         } catch (IOException e) {
             Log.i(TAG, "Something wrong with saving database");
         }

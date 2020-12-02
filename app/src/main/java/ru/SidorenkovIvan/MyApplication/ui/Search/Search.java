@@ -3,19 +3,25 @@ package ru.SidorenkovIvan.MyApplication.ui.Search;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import ru.SidorenkovIvan.MyApplication.PaginationScrollListener;
 import ru.SidorenkovIvan.MyApplication.Product;
 import ru.SidorenkovIvan.MyApplication.R;
 
@@ -32,7 +38,9 @@ public class Search extends Fragment {
 
         SearchView searchView = view.findViewById(R.id.searchView);
         RecyclerView recyclerViewSearch = view.findViewById(R.id.recyclerViewSearch);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+
+        recyclerViewSearch.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewSearch.setItemAnimator(new DefaultItemAnimator());
         FragmentManager fragmentManager = getFragmentManager();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -41,7 +49,6 @@ public class Search extends Fragment {
                 Log.i(TAG, "onQueryTextSubmit: " + query);
 
                 searchAdapter = new SearchAdapter(fragmentManager, search(query));
-                recyclerViewSearch.setLayoutManager(layoutManager);
                 recyclerViewSearch.setAdapter(searchAdapter);
                 return false;
             }
@@ -51,11 +58,11 @@ public class Search extends Fragment {
                 Log.i(TAG, "onQueryTextChange: " + newText);
 
                 searchAdapter = new SearchAdapter(fragmentManager, search(newText));
-                recyclerViewSearch.setLayoutManager(layoutManager);
                 recyclerViewSearch.setAdapter(searchAdapter);
                 return false;
             }
         });
+
         return view;
     }
 
@@ -63,14 +70,14 @@ public class Search extends Fragment {
         ArrayList<Product> products = new ArrayList<>();
         String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-        Cursor cursor = db.rawQuery("SELECT * FROM product WHERE productTitle like ?", new String[]{"%" + keyword + "%"});
-        Cursor cursor1 = db.rawQuery("SELECT * FROM product WHERE code like ?", new String[]{"%" + keyword + "%"});
+        Cursor cursor = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE productTitle LIKE ?", new String[]{"%" + keyword + "%"});
+        Cursor cursor1 = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE code LIKE ?", new String[]{"%" + keyword + "%"});
         if (cursor.moveToFirst()) {
             do {
                 Product product = new Product();
                 product.setId(cursor.getString(0));
-                product.setTitle(cursor.getString(2));
-                product.setCode(cursor.getString(6));
+                product.setTitle(cursor.getString(1));
+                product.setCode(cursor.getString(2));
                 products.add(product);
             } while (cursor.moveToNext());
 
@@ -82,8 +89,8 @@ public class Search extends Fragment {
             do {
                 Product product = new Product();
                 product.setId(cursor1.getString(0));
-                product.setTitle(cursor1.getString(2));
-                product.setCode(cursor1.getString(6));
+                product.setTitle(cursor1.getString(1));
+                product.setCode(cursor1.getString(2));
                 products.add(product);
             } while (cursor1.moveToNext());
 

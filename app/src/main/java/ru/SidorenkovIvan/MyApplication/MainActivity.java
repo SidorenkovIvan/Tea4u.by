@@ -164,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
         final FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.setReorderingAllowed(true);
 
         final int count = fragmentManager.getBackStackEntryCount();
         if (name.equals(FRAGMENT_OTHER)) {

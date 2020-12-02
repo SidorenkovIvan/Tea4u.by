@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +13,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ru.SidorenkovIvan.MyApplication.Category;
+import ru.SidorenkovIvan.MyApplication.DBController;
 import ru.SidorenkovIvan.MyApplication.R;
 
 public class Catalog extends Fragment {
@@ -29,7 +29,7 @@ public class Catalog extends Fragment {
         FragmentManager fragmentManager = getFragmentManager();
 
         String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
-        List<Category> category = Category.getNotEmptyCategories(dbPath);
+        List<Category> category = DBController.getNotEmptyCategories(dbPath);
 
         CatalogAdapter catalogAdapter = new CatalogAdapter(fragmentManager, category);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

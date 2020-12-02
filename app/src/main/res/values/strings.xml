@@ -113,4 +113,16 @@
     <string name="vk">Чай для Тебя</string>
     <string name="downloading_new_teas">Загружаем новые чаи…</string>
     <string name="new_products">НОВЫЕ ПОСТУПЛЕНИЯ</string>
+
+    <string-array name="splash_titles">
+        <item>Завариваем чай…</item>
+        <item>Чайник кипит…</item>
+        <item>Загружаем новые чаи…</item>
+        <item>Переходим на чайную сторону…</item>
+        <item>Готовим чайную церемонию…</item>
+        <item>Собираем чай для Вас…</item>
+        <item>Промываем заварник…</item>
+        <item>Выбираем чашку…</item>
+        <item>Покупаем сладости к чаю…</item>
+    </string-array>
 </resources>

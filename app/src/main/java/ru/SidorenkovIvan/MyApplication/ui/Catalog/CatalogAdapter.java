@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Objects;
 import androidx.fragment.app.FragmentManager;
@@ -38,14 +39,14 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.ViewHold
         mCategory = categoriesIdAndTitles;
     }
 
+    @NotNull
     @Override
     public CatalogAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View catalogView = inflater.inflate(R.layout.item_catalog, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(catalogView);
-        return viewHolder;
+        return new ViewHolder(catalogView);
     }
 
     @Override
