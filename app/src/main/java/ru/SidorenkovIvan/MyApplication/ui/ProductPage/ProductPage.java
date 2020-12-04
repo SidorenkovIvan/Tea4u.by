@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -20,15 +22,10 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.rd.PageIndicatorView;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -38,7 +35,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-import ru.SidorenkovIvan.MyApplication.ForCache;
 import ru.SidorenkovIvan.MyApplication.ImageLoader;
 import ru.SidorenkovIvan.MyApplication.Product;
 import ru.SidorenkovIvan.MyApplication.R;
@@ -46,8 +42,6 @@ import ru.SidorenkovIvan.MyApplication.ViewPagerAdapter;
 
 public class ProductPage extends Fragment {
 
-    private static final String TAG = "MyApp";
-    private static final String DBname = "data.sqlite";
     public static final Object load = new Object();
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
@@ -75,16 +69,18 @@ public class ProductPage extends Fragment {
         new Thread(() -> {
             try {
                 if (connected()) {
-                    ImageLoader imageLoader = new ImageLoader(id, product.getImages());
+                    ImageLoader imageLoader = new ImageLoader(getContext(), id, product.getImages());
                     imageLoader.isLoad();
 
                     synchronized (load) {
-                        pagerAdapter = new ViewPagerAdapter(getContext(), ForCache.getLargeImagesFromMemoryCache(id));
+                        ArrayList<Bitmap> bitmaps = new ArrayList<>();
+                        for (BitmapDrawable d : imageLoader.getCache(id)) bitmaps.add(d.getBitmap());
+                        pagerAdapter = new ViewPagerAdapter(getContext(), bitmaps);
 
                         viewPager.post(() -> viewPager.setAdapter(pagerAdapter));
 
                         pageIndicatorView.post(() -> pageIndicatorView.setViewPager(viewPager));
-                        pageIndicatorView.post(() -> pageIndicatorView.setCount(ForCache.getLargeImagesFromMemoryCache(id).size()));
+                        pageIndicatorView.post(() -> pageIndicatorView.setCount(imageLoader.getCache(id).size()));
                     }
                 } else {
                     pagerAdapter = new ViewPagerAdapter(getContext(), productImage);
@@ -115,6 +111,7 @@ public class ProductPage extends Fragment {
         price = price.replace("{", "");
         price = price.replace("}", ":\n");
         price = price.replace("|", "\n");
+        String TAG = "MyApp";
         Log.i(TAG, "Price is: " + price);
         textViewPrice.setText(price);
 
@@ -171,6 +168,7 @@ public class ProductPage extends Fragment {
     }
 
     private void getProduct() {
+        String DBname = "data.sqlite";
         String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
 
