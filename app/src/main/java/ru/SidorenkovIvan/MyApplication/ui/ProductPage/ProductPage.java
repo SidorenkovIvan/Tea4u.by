@@ -22,13 +22,16 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
 import com.rd.PageIndicatorView;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -36,6 +39,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import ru.SidorenkovIvan.MyApplication.ForCache;
+import ru.SidorenkovIvan.MyApplication.ImageLoader;
 import ru.SidorenkovIvan.MyApplication.Product;
 import ru.SidorenkovIvan.MyApplication.R;
 import ru.SidorenkovIvan.MyApplication.ViewPagerAdapter;
@@ -44,13 +48,13 @@ public class ProductPage extends Fragment {
 
     private static final String TAG = "MyApp";
     private static final String DBname = "data.sqlite";
+    public static final Object load = new Object();
     private ViewPager viewPager;
+    private PagerAdapter pagerAdapter;
     private PageIndicatorView pageIndicatorView;
     private Product product;
     private String id;
-    private String price;
     private final ArrayList<Bitmap> productImage = new ArrayList<>();
-    private final ArrayList<Bitmap> bitmapOfImages = new ArrayList<>();
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -66,52 +70,53 @@ public class ProductPage extends Fragment {
 
         product = new Product();
         initViewPager(view);
+        getProduct();
 
         new Thread(() -> {
-            getProduct();
+            try {
+                if (connected()) {
+                    ImageLoader imageLoader = new ImageLoader(id, product.getImages());
+                    imageLoader.isLoad();
 
-            //TextView with title and code
-            TextView textViewTitle = view.findViewById(R.id.textViewTitle);
-            textViewTitle.post(() -> textViewTitle.setText(product.getTitle() + "  (" + product.getCode() + ")"));
+                    synchronized (load) {
+                        pagerAdapter = new ViewPagerAdapter(getContext(), ForCache.getLargeImagesFromMemoryCache(id));
 
-            if (connected()) {
-                if (ForCache.getLargeImagesFromMemoryCache(id) == null) {
-                    getLargeImages();
+                        viewPager.post(() -> viewPager.setAdapter(pagerAdapter));
+
+                        pageIndicatorView.post(() -> pageIndicatorView.setViewPager(viewPager));
+                        pageIndicatorView.post(() -> pageIndicatorView.setCount(ForCache.getLargeImagesFromMemoryCache(id).size()));
+                    }
+                } else {
+                    pagerAdapter = new ViewPagerAdapter(getContext(), productImage);
+                    viewPager.post(() -> viewPager.setAdapter(pagerAdapter));
+
+                    pageIndicatorView.post(() -> pageIndicatorView.setViewPager(viewPager));
+                    pageIndicatorView.post(() -> pageIndicatorView.setCount(productImage.size()));
                 }
-                PagerAdapter adapter = new ViewPagerAdapter(getContext(), ForCache.getLargeImagesFromMemoryCache(id));
-                viewPager.post(() -> viewPager.setAdapter(adapter));
-
-                pageIndicatorView.post(() -> pageIndicatorView.setViewPager(viewPager));
-                pageIndicatorView.post(() -> pageIndicatorView.setCount(ForCache.getLargeImagesFromMemoryCache(id).size()));
-
-            } else {
-                PagerAdapter adapter = new ViewPagerAdapter(getContext(), productImage);
-                viewPager.post(() -> viewPager.setAdapter(adapter));
-
-                pageIndicatorView.post(() -> pageIndicatorView.setViewPager(viewPager));
-                pageIndicatorView.post(() -> pageIndicatorView.setCount(productImage.size()));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-
-            //TextView with description
-            TextView textViewDescription = view.findViewById(R.id.textViewDescription);
-            textViewDescription.post(() -> textViewDescription.setText(product.getDescription()));
-
-            //Output of price and button to go to the site
-            Button button = view.findViewById(R.id.buttonToSite);
-            button.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(product.getProductUrl()))));
-
-            TextView textViewPrice = view.findViewById(R.id.textViewPrice);
-            price = product.getPrice();
-            price = price.replace("{", "");
-            price = price.replace("}", ":\n");
-            price = price.replace("|", "\n");
-            Log.i(TAG, "Price is: " + price);
-            textViewPrice.post(() -> textViewPrice.setText(price));
-
-            ScrollView scrollView = view.findViewById(R.id.scrollView2);
-            scrollView.post(() -> scrollView.setVisibility(View.VISIBLE));
-
         }).start();
+
+        //TextView with title and code
+        TextView textViewTitle = view.findViewById(R.id.textViewTitle);
+        textViewTitle.post(() -> textViewTitle.setText(product.getTitle() + "  (" + product.getCode() + ")"));
+
+        //TextView with description
+        TextView textViewDescription = view.findViewById(R.id.textViewDescription);
+        textViewDescription.setText(product.getDescription());
+
+        //Output of price and button to go to the site
+        Button button = view.findViewById(R.id.buttonToSite);
+        button.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(product.getProductUrl()))));
+
+        TextView textViewPrice = view.findViewById(R.id.textViewPrice);
+        String price = product.getPrice();
+        price = price.replace("{", "");
+        price = price.replace("}", ":\n");
+        price = price.replace("|", "\n");
+        Log.i(TAG, "Price is: " + price);
+        textViewPrice.setText(price);
 
         return view;
     }
@@ -151,19 +156,6 @@ public class ProductPage extends Fragment {
         });
     }
 
-    public static Bitmap getBitmapFromURL(String src) {
-        try {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            return BitmapFactory.decodeStream(input);
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
     public boolean connected() {
         ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -201,15 +193,6 @@ public class ProductPage extends Fragment {
         query1.close();
 
         db.close();
-    }
-
-    private void getLargeImages() {
-        bitmapOfImages.clear();
-        String imagesString = product.getImages().replace("|", " ").trim();
-        String[] images = imagesString.split("[ ]");
-
-        for (String s : images) bitmapOfImages.add(getBitmapFromURL(s));
-        ForCache.addLargeImagesToMemoryCache(id, bitmapOfImages);
     }
 
     @Override

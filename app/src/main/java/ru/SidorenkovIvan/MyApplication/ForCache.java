@@ -2,7 +2,6 @@ package ru.SidorenkovIvan.MyApplication;
 
 import android.graphics.Bitmap;
 import android.util.LruCache;
-
 import java.util.ArrayList;
 
 public class ForCache {

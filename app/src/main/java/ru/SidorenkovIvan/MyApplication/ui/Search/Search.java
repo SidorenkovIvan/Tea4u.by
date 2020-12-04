@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import ru.SidorenkovIvan.MyApplication.DBController;
 import ru.SidorenkovIvan.MyApplication.PaginationScrollListener;
 import ru.SidorenkovIvan.MyApplication.Product;
 import ru.SidorenkovIvan.MyApplication.R;
@@ -29,7 +30,15 @@ public class Search extends Fragment {
 
     private static final String TAG = "MyApp";
     private static final String DBname = "data.sqlite";
+    private String dbPath;
+
     private SearchAdapter searchAdapter;
+    private ProgressBar progressBar;
+
+    private boolean isLoading;
+    private boolean isLastPage;
+    private final int TOTAL_PAGES = 13;
+    private int currentPage;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -37,19 +46,20 @@ public class Search extends Fragment {
         View view = inflater.inflate(R.layout.search_fragment, container, false);
 
         SearchView searchView = view.findViewById(R.id.searchView);
-        RecyclerView recyclerViewSearch = view.findViewById(R.id.recyclerViewSearch);
-
-        recyclerViewSearch.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerViewSearch.setItemAnimator(new DefaultItemAnimator());
         FragmentManager fragmentManager = getFragmentManager();
+        dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
+        currentPage = 0;
+        isLoading = false;
+        isLastPage = false;
+
+        RecyclerView recyclerViewSearch = view.findViewById(R.id.recyclerViewSearch);
+        progressBar = view.findViewById(R.id.searchProgressBar);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerViewSearch.setLayoutManager(layoutManager);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.i(TAG, "onQueryTextSubmit: " + query);
-
-                searchAdapter = new SearchAdapter(fragmentManager, search(query));
-                recyclerViewSearch.setAdapter(searchAdapter);
                 return false;
             }
 
@@ -57,8 +67,41 @@ public class Search extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 Log.i(TAG, "onQueryTextChange: " + newText);
 
-                searchAdapter = new SearchAdapter(fragmentManager, search(newText));
+                searchAdapter = new SearchAdapter(fragmentManager);
                 recyclerViewSearch.setAdapter(searchAdapter);
+
+                currentPage = 0;
+                isLoading = false;
+                isLastPage = false;
+
+                String text = newText;
+
+                recyclerViewSearch.addOnScrollListener(new PaginationScrollListener(layoutManager) {
+                    @Override
+                    protected void loadMoreItems() {
+                        isLoading = true;
+                        currentPage += 1;
+
+                        new Handler().postDelayed(() -> loadNextPage(text), 200);
+                    }
+
+                    @Override
+                    public int getTotalPageCount() {
+                        return TOTAL_PAGES;
+                    }
+
+                    @Override
+                    public boolean isLastPage() {
+                        return isLastPage;
+                    }
+
+                    @Override
+                    public boolean isLoading() {
+                        return isLoading;
+                    }
+                });
+
+                new Handler().postDelayed(() ->loadFirstPage(text), 200);
                 return false;
             }
         });
@@ -66,12 +109,11 @@ public class Search extends Fragment {
         return view;
     }
 
-    private ArrayList<Product> search(String keyword) {
+    private ArrayList<Product> search(String keyword, int offset) {
         ArrayList<Product> products = new ArrayList<>();
-        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-        Cursor cursor = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE productTitle LIKE ?", new String[]{"%" + keyword + "%"});
-        Cursor cursor1 = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE code LIKE ?", new String[]{"%" + keyword + "%"});
+        Cursor cursor = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE productTitle LIKE ? LIMIT 10 OFFSET '" + offset + "'", new String[]{"%" + keyword + "%"});
+        Cursor cursor1 = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE code LIKE ? LIMIT 10 OFFSET '" + offset + "'", new String[]{"%" + keyword + "%"});
         if (cursor.moveToFirst()) {
             do {
                 Product product = new Product();
@@ -106,6 +148,30 @@ public class Search extends Fragment {
 
             return products;
         }
+    }
+
+    private void loadFirstPage(String newText) {
+        Log.d("Loading...", "loadFirstPage: ");
+        List<Product> products = search(newText, currentPage);
+        progressBar.setVisibility(View.GONE);
+        searchAdapter.addAll(products);
+
+        if (currentPage <= TOTAL_PAGES) searchAdapter.addLoadingFooter();
+        else isLastPage = true;
+
+    }
+
+    private void loadNextPage(String newText) {
+        Log.d("Loading...", "loadNextPage: " + currentPage);
+        List<Product> products = search(newText, currentPage * 10);
+
+        searchAdapter.removeLoadingFooter();
+        isLoading = false;
+
+        searchAdapter.addAll(products);
+
+        if (currentPage != TOTAL_PAGES) searchAdapter.addLoadingFooter();
+        else isLastPage = true;
     }
 
     @Override

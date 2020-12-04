@@ -25,7 +25,7 @@
     <show-object-properties value="false" />
     <loaded-nodes>
       <connection connection-id="fa3ec914-e79b-4722-abf2-4f8761b6ec14">
-        <schema name="main" object-types="column, table, view, dataset trigger, constraint, index" />
+        <schema name="main" object-types="table, view" />
       </connection>
     </loaded-nodes>
   </component>
@@ -50,6 +50,9 @@
   </component>
   <component name="DBNavigator.Project.EditorStateManager">
     <last-used-providers />
+  </component>
+  <component name="DBNavigator.Project.ExecutionManager">
+    <retain-sticky-names value="false" />
   </component>
   <component name="DBNavigator.Project.MethodExecutionManager">
     <method-browser />

@@ -31,15 +31,13 @@ public class Categories extends Fragment {
     private String dbPath;
 
     private ProductAdapter productAdapter;
-    private GridLayoutManager layoutManager;
     private ProgressBar progressBar;
 
     private String categoryId;
-    private static final int PAGE_START = 0;
-    private boolean isLoading = false;
-    private boolean isLastPage = false;
+    private boolean isLoading;
+    private boolean isLastPage;
     private final int TOTAL_PAGES = 3;
-    private int currentPage = PAGE_START;
+    private int currentPage;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -48,6 +46,9 @@ public class Categories extends Fragment {
 
         dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
         FragmentManager fragmentManager = getFragmentManager();
+        currentPage = 0;
+        isLoading = false;
+        isLastPage = false;
 
         Bundle bundle = getArguments();
         categoryId = (String) Objects.requireNonNull(bundle).get("categoryID");
@@ -58,7 +59,7 @@ public class Categories extends Fragment {
 
         RecyclerView recyclerViewProducts = view.findViewById(R.id.recyclerViewProducts);
         progressBar = view.findViewById(R.id.main_progress);
-        layoutManager = new GridLayoutManager(getContext(), 2);
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
         recyclerViewProducts.setLayoutManager(layoutManager);
 
         productAdapter = new ProductAdapter(fragmentManager);
@@ -70,8 +71,7 @@ public class Categories extends Fragment {
                 isLoading = true;
                 currentPage += 1;
 
-                // mocking network delay for API call
-                new Handler().postDelayed(() -> loadNextPage(), 1000);
+                new Handler().postDelayed(() -> loadNextPage(), 100);
             }
 
             @Override
@@ -90,9 +90,7 @@ public class Categories extends Fragment {
             }
         });
 
-
-        // mocking network delay for API call
-        new Handler().postDelayed(this::loadFirstPage, 1000);
+        loadFirstPage();
 
         return view;
     }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
@@ -18,68 +19,66 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        style="@style/CustomText"
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="70dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="30dp"
-        android:fontFamily="@font/opensans"
         android:lineSpacingExtra="5sp"
         android:text="@string/phone_call_back"
-        android:textColor="@color/textColor"
         android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@+id/button_input_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_input_back" />
 
     <TextView
-        android:id="@+id/textView2"
+        style="@style/CustomText"
+        android:id="@+id/textViewPhone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="21dp"
-        android:fontFamily="@font/opensans"
         android:lineSpacingExtra="3sp"
-        android:text="Телефон"
-        android:textColor="@color/textColor"
+        android:text="@string/phone"
         android:textSize="13sp"
-        app:layout_constraintStart_toStartOf="@+id/linearLayout3"
+        app:layout_constraintStart_toStartOf="@+id/editTextPhone"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <br.com.sapereaude.maskedEditText.MaskedEditText
-        android:id="@+id/linearLayout3"
+        style="@style/CustomText"
+        android:id="@+id/editTextPhone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:background="@drawable/rectangle_for_call_back"
-        android:fontFamily="@font/opensans"
         android:inputType="phone"
         android:lineSpacingExtra="3sp"
         android:paddingStart="10dp"
-        android:textColor="@color/textColor"
         android:textSize="12sp"
         app:allowed_chars="0123456789"
         app:mask="+375 ## ###-##-##"
         app:keep_hint="true"
         app:layout_constraintEnd_toEndOf="@+id/textView"
         app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewPhone"
+        tools:ignore="RtlSymmetry" />
 
     <TextView
+        style="@style/CustomText"
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:fontFamily="@font/opensans"
         android:lineSpacingExtra="3sp"
-        android:text="Ваше имя"
-        android:textColor="@color/textColor"
+        android:text="@string/your_name"
         android:textSize="13sp"
-        app:layout_constraintStart_toStartOf="@+id/linearLayout3"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
+        app:layout_constraintStart_toStartOf="@+id/editTextPhone"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPhone" />
 
     <EditText
-        android:id="@+id/linearLayout4"
+        style="@style/CustomText"
+        android:id="@+id/editTextName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
@@ -87,28 +86,27 @@
         android:inputType="textPersonName"
         android:lineSpacingExtra="3sp"
         android:paddingStart="10dp"
-        android:textColor="@color/textColor"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        android:autofillHints=""
+        tools:ignore="LabelFor,RtlSymmetry" />
 
     <Button
+        style="@style/CustomText"
         android:id="@+id/button_send_back_call"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/colorForSmallCategories"
         android:layout_marginTop="21dp"
         android:layout_marginBottom="30dp"
-        android:fontFamily="@font/opensans"
         android:lineSpacingExtra="4sp"
         android:paddingHorizontal="19dp"
         android:text="@string/send"
-        android:textAllCaps="false"
-        android:textColor="@color/textColor"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/linearLayout4"
-        app:layout_constraintStart_toStartOf="@+id/linearLayout4"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout4" />
+        app:layout_constraintEnd_toEndOf="@+id/editTextName"
+        app:layout_constraintStart_toStartOf="@+id/editTextName"
+        app:layout_constraintTop_toBottomOf="@+id/editTextName" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

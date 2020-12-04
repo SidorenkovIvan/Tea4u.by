@@ -1,17 +1,13 @@
 package ru.SidorenkovIvan.MyApplication.ui.Categories;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -53,7 +49,7 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 break;
         }
 
-        return viewHolder;
+        return Objects.requireNonNull(viewHolder);
     }
 
     private RecyclerView.ViewHolder getViewHolder(ViewGroup parent, LayoutInflater inflater) {
@@ -131,7 +127,7 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return mProducts.size();
     }
 
-    public static  class ProductVH extends RecyclerView.ViewHolder {
+    public static class ProductVH extends RecyclerView.ViewHolder {
         public ImageButton imageButton;
         public TextView textView;
 

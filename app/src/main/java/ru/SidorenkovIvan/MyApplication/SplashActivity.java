@@ -11,10 +11,8 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,7 +24,6 @@ import java.net.URLConnection;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity {
