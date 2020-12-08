@@ -7,8 +7,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.util.LruCache;
-
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -16,17 +17,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
-
 import static ru.SidorenkovIvan.MyApplication.ui.ProductPage.ProductPage.load;
 
 public class ImageLoader {
 
-    private final int availableMem = (int) (Runtime.getRuntime().maxMemory());
+    private final int availableMem = (int) (Runtime.getRuntime().maxMemory() / 16);
     private final int cacheMem = availableMem;
     public LruCache<String, ArrayList<BitmapDrawable>> lruCache = new LruCache<>(cacheMem);
 
     private final HashMap<String, ArrayList<BitmapDrawable>> diskCache = new HashMap<>();
-    private File cacheDir;
+    private final File cacheDir;
 
     PhotosQueue photosQueue = new PhotosQueue();
     PhotosLoader photoLoaderThread = new PhotosLoader();
@@ -52,14 +52,10 @@ public class ImageLoader {
 
         if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
             cacheDir = new File(android.os.Environment.getExternalStorageDirectory(), "CacheImages");
-            Log.d("Memory", String.valueOf(cacheDir));
-        }
-        else {
+        } else {
             cacheDir = context.getCacheDir();
-            Log.d("Memory1", String.valueOf(cacheDir));
         }
-        if(!cacheDir.exists()) {
-            Log.d("Memory2", String.valueOf(cacheDir));
+        if (!cacheDir.exists()) {
             cacheDir.mkdirs();
         }
     }
@@ -72,13 +68,11 @@ public class ImageLoader {
         for (String s : pImages) queuePhoto(s);
     }
 
-    static class PhotosQueue
-    {
+    static class PhotosQueue {
         private final Stack<PhotoToLoad> photosToLoad = new Stack<>();
     }
 
-    private void queuePhoto(String url)
-    {
+    private void queuePhoto(String url) {
         PhotoToLoad p = new PhotoToLoad(url);
         synchronized (photosQueue.photosToLoad) {
             photosQueue.photosToLoad.push(p);
@@ -106,13 +100,12 @@ public class ImageLoader {
     private static class PhotoToLoad {
         public String mUrl;
 
-        public PhotoToLoad(String url){
+        public PhotoToLoad(String url) {
             mUrl = url;
         }
     }
 
-    public void stopThread()
-    {
+    public void stopThread() {
         photoLoaderThread.interrupt();
     }
 
@@ -152,17 +145,51 @@ public class ImageLoader {
 
     public void isLoad() throws InterruptedException {
         if (diskCache.containsKey(mId) && getCache(mId) == null) {
+            String filename = String.valueOf(mId.hashCode());
+            File f = new File(cacheDir, filename);
+
+            Bitmap bitmap = decodeFile(f);
+            ArrayList<BitmapDrawable> bitmapDrawables = new ArrayList<>();
+            bitmapDrawables.add(new BitmapDrawable(Resources.getSystem(), bitmap));
+
             Log.d("Memory", String.valueOf(diskCache.containsKey(mId)));
-            addCache(mId, diskCache.get(mId));
+            addCache(mId, bitmapDrawables);
+            synchronized (load) {
+                load.notify();
+            }
         } else if (!diskCache.containsKey(mId)) {
             getImages(mImages);
             synchronized (load) {
                 load.wait();
             }
-        } else {
+        } else
             synchronized (load) {
                 load.notify();
             }
-        }
+    }
+
+    private Bitmap decodeFile(File f){
+        try {
+            //decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(new FileInputStream(f),null,o);
+
+            //Find the correct scale value. It should be the power of 2.
+            final int REQUIRED_SIZE=70;
+            int width_tmp=o.outWidth, height_tmp=o.outHeight;
+            int scale=1;
+            while (width_tmp / 2 >= REQUIRED_SIZE && height_tmp / 2 >= REQUIRED_SIZE) {
+                width_tmp /= 2;
+                height_tmp /= 2;
+                scale++;
+            }
+
+            //decode with inSampleSize
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize=scale;
+            return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
+        } catch (FileNotFoundException ignored) {}
+        return null;
     }
 }

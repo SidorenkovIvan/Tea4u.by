@@ -17,14 +17,13 @@ import ru.SidorenkovIvan.MyApplication.R;
 import ru.SidorenkovIvan.MyApplication.ui.ProductPage.ProductPage;
 
 public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<Product> mProducts;
+    private final List<Product> mProducts;
     private final FragmentManager fragmentManager;
 
     private boolean isLoadingAdded = false;
 
     private static final int ITEM = 0;
     private static final int LOADING = 1;
-
 
     public SearchAdapter (FragmentManager manager) {
         fragmentManager = manager;

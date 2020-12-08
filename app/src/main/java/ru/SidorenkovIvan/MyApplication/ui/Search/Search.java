@@ -12,32 +12,29 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import java.util.ArrayList;
 import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import ru.SidorenkovIvan.MyApplication.DBController;
 import ru.SidorenkovIvan.MyApplication.PaginationScrollListener;
 import ru.SidorenkovIvan.MyApplication.Product;
 import ru.SidorenkovIvan.MyApplication.R;
 
 public class Search extends Fragment {
 
-    private static final String TAG = "MyApp";
-    private static final String DBname = "data.sqlite";
+    private final String TAG = "MyApp";
     private String dbPath;
+    private String text;
 
     private SearchAdapter searchAdapter;
     private ProgressBar progressBar;
 
     private boolean isLoading;
     private boolean isLastPage;
-    private final int TOTAL_PAGES = 13;
+    private final int TOTAL_PAGES = 15;
     private int currentPage;
 
     @Override
@@ -47,7 +44,7 @@ public class Search extends Fragment {
 
         SearchView searchView = view.findViewById(R.id.searchView);
         FragmentManager fragmentManager = getFragmentManager();
-        dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
+        dbPath = requireContext().getApplicationInfo().dataDir + "/" + "data.sqlite";
         currentPage = 0;
         isLoading = false;
         isLastPage = false;
@@ -57,9 +54,21 @@ public class Search extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerViewSearch.setLayoutManager(layoutManager);
 
+        searchAdapter = new SearchAdapter(fragmentManager);
+        recyclerViewSearch.setAdapter(searchAdapter);
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                Log.i(TAG, "onQueryTextSubmit: " + query);
+
+                searchAdapter = new SearchAdapter(fragmentManager);
+                recyclerViewSearch.setAdapter(searchAdapter);
+                text = query;
+                currentPage = 0;
+
+                loadFirstPage(text);
+
                 return false;
             }
 
@@ -69,40 +78,37 @@ public class Search extends Fragment {
 
                 searchAdapter = new SearchAdapter(fragmentManager);
                 recyclerViewSearch.setAdapter(searchAdapter);
-
+                text = newText;
                 currentPage = 0;
-                isLoading = false;
-                isLastPage = false;
 
-                String text = newText;
+                loadFirstPage(text);
 
-                recyclerViewSearch.addOnScrollListener(new PaginationScrollListener(layoutManager) {
-                    @Override
-                    protected void loadMoreItems() {
-                        isLoading = true;
-                        currentPage += 1;
-
-                        new Handler().postDelayed(() -> loadNextPage(text), 200);
-                    }
-
-                    @Override
-                    public int getTotalPageCount() {
-                        return TOTAL_PAGES;
-                    }
-
-                    @Override
-                    public boolean isLastPage() {
-                        return isLastPage;
-                    }
-
-                    @Override
-                    public boolean isLoading() {
-                        return isLoading;
-                    }
-                });
-
-                new Handler().postDelayed(() ->loadFirstPage(text), 200);
                 return false;
+            }
+        });
+
+        recyclerViewSearch.addOnScrollListener(new PaginationScrollListener(layoutManager) {
+            @Override
+            protected void loadMoreItems() {
+                isLoading = true;
+                currentPage += 1;
+
+                new Handler().postDelayed(() -> loadNextPage(text), 500);
+            }
+
+            @Override
+            public int getTotalPageCount() {
+                return TOTAL_PAGES;
+            }
+
+            @Override
+            public boolean isLastPage() {
+                return isLastPage;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return isLoading;
             }
         });
 
@@ -112,8 +118,8 @@ public class Search extends Fragment {
     private ArrayList<Product> search(String keyword, int offset) {
         ArrayList<Product> products = new ArrayList<>();
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-        Cursor cursor = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE productTitle LIKE ? LIMIT 10 OFFSET '" + offset + "'", new String[]{"%" + keyword + "%"});
-        Cursor cursor1 = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE code LIKE ? LIMIT 10 OFFSET '" + offset + "'", new String[]{"%" + keyword + "%"});
+        Cursor cursor = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE productTitle LIKE ? LIMIT 15 OFFSET '" + offset + "'", new String[]{"%" + keyword + "%"});
+        Cursor cursor1 = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE code LIKE ? LIMIT 15 OFFSET '" + offset + "'", new String[]{"%" + keyword + "%"});
         if (cursor.moveToFirst()) {
             do {
                 Product product = new Product();
@@ -142,9 +148,14 @@ public class Search extends Fragment {
             return products;
         } else {
             Product product = new Product();
-            product.setTitle("Не найдено");
+            product.setId("");
+            product.setTitle("");
             product.setCode("");
             products.add(product);
+
+            isLoading = false;
+            isLastPage = true;
+            currentPage = TOTAL_PAGES;
 
             return products;
         }
@@ -156,14 +167,14 @@ public class Search extends Fragment {
         progressBar.setVisibility(View.GONE);
         searchAdapter.addAll(products);
 
-        if (currentPage <= TOTAL_PAGES) searchAdapter.addLoadingFooter();
+        Log.d("Products count", String.valueOf(searchAdapter.getItemCount()));
+        if (currentPage < TOTAL_PAGES && searchAdapter.getItemCount() >= 15) searchAdapter.addLoadingFooter();
         else isLastPage = true;
-
     }
 
     private void loadNextPage(String newText) {
         Log.d("Loading...", "loadNextPage: " + currentPage);
-        List<Product> products = search(newText, currentPage * 10);
+        List<Product> products = search(newText, currentPage * 15);
 
         searchAdapter.removeLoadingFooter();
         isLoading = false;

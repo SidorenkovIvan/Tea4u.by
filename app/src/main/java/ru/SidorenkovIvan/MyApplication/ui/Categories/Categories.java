@@ -95,10 +95,10 @@ public class Categories extends Fragment {
         return view;
     }
 
-    public ArrayList<String> getProductsId(String ID, String dbPath, int offset) {
+    public ArrayList<String> getProductsId(String id, String dbPath, int offset) {
         ArrayList<String> productId = new ArrayList<>();
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-        Cursor query = db.rawQuery("SELECT DISTINCT product_id FROM category_product WHERE category_id = '" + ID + "' LIMIT 10 OFFSET '" + offset + "'", null);
+        Cursor query = db.rawQuery("SELECT DISTINCT product_id FROM category_product WHERE category_id = '" + id + "' LIMIT 10 OFFSET '" + offset + "'", null);
         query.moveToFirst();
         while (!query.isAfterLast()) {
             productId.add(query.getString(0));
@@ -118,7 +118,6 @@ public class Categories extends Fragment {
 
         if (currentPage <= TOTAL_PAGES) productAdapter.addLoadingFooter();
         else isLastPage = true;
-
     }
 
     private void loadNextPage() {

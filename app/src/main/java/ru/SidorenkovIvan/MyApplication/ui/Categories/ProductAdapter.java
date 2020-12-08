@@ -19,7 +19,6 @@ import ru.SidorenkovIvan.MyApplication.R;
 import ru.SidorenkovIvan.MyApplication.ui.ProductPage.ProductPage;
 
 public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
     private final List<Product> mProducts;
     private final FragmentManager fragmentManager;
 
