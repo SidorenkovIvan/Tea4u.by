@@ -7,19 +7,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public abstract class PaginationScrollListener extends RecyclerView.OnScrollListener {
 
-    LinearLayoutManager layoutManager;
+    private final LinearLayoutManager mLayoutManager;
 
-    public PaginationScrollListener(LinearLayoutManager layoutManager) {
-        this.layoutManager = layoutManager;
+    public PaginationScrollListener(final LinearLayoutManager pLayoutManager) {
+        mLayoutManager = pLayoutManager;
     }
 
     @Override
-    public void onScrolled(@NotNull RecyclerView recyclerView, int dx, int dy) {
-        super.onScrolled(recyclerView, dx, dy);
+    public void onScrolled(@NotNull final RecyclerView pRecyclerView, final int pDx, final int pDy) {
+        super.onScrolled(pRecyclerView, pDx, pDy);
 
-        int visibleItemCount = layoutManager.getChildCount();
-        int totalItemCount = layoutManager.getItemCount();
-        int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+        int visibleItemCount = mLayoutManager.getChildCount();
+        int totalItemCount = mLayoutManager.getItemCount();
+        int firstVisibleItemPosition = mLayoutManager.findFirstVisibleItemPosition();
 
         if (!isLoading() && !isLastPage()) {
             if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount

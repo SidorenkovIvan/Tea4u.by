@@ -27,66 +27,66 @@ import ru.SidorenkovIvan.MyApplication.R;
 
 public class Categories extends Fragment {
 
-    private static final String DBname = "data.sqlite";
-    private String dbPath;
+    private static final String mDbName = "data.sqlite";
+    private String mDbPath;
 
-    private ProductAdapter productAdapter;
-    private ProgressBar progressBar;
+    private ProductAdapter mProductAdapter;
+    private ProgressBar mProgressBar;
 
-    private String categoryId;
-    private boolean isLoading;
-    private boolean isLastPage;
-    private final int TOTAL_PAGES = 3;
-    private int currentPage;
+    private String mCategoryId;
+    private boolean mIsLoading;
+    private boolean mIsLastPage;
+    private final int mTotalPages = 3;
+    private int mCurrentPage;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.categories_fragment, container, false);
 
-        dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
+        mDbPath = requireContext().getApplicationInfo().dataDir + "/" + mDbName;
         FragmentManager fragmentManager = getFragmentManager();
-        currentPage = 0;
-        isLoading = false;
-        isLastPage = false;
+        mCurrentPage = 0;
+        mIsLoading = false;
+        mIsLastPage = false;
 
         Bundle bundle = getArguments();
-        categoryId = (String) Objects.requireNonNull(bundle).get("categoryID");
+        mCategoryId = (String) Objects.requireNonNull(bundle).get("categoryID");
         String categoryTitle = (String) bundle.get("categoryTitle");
 
         TextView textViewCategory = view.findViewById(R.id.textViewCategory);
         textViewCategory.setText(categoryTitle);
 
         RecyclerView recyclerViewProducts = view.findViewById(R.id.recyclerViewProducts);
-        progressBar = view.findViewById(R.id.main_progress);
+        mProgressBar = view.findViewById(R.id.main_progress);
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
         recyclerViewProducts.setLayoutManager(layoutManager);
 
-        productAdapter = new ProductAdapter(fragmentManager);
-        recyclerViewProducts.setAdapter(productAdapter);
+        mProductAdapter = new ProductAdapter(fragmentManager);
+        recyclerViewProducts.setAdapter(mProductAdapter);
 
         recyclerViewProducts.addOnScrollListener(new PaginationScrollListener(layoutManager) {
             @Override
             protected void loadMoreItems() {
-                isLoading = true;
-                currentPage += 1;
+                mIsLoading = true;
+                mCurrentPage += 1;
 
                 new Handler().postDelayed(() -> loadNextPage(), 100);
             }
 
             @Override
             public int getTotalPageCount() {
-                return TOTAL_PAGES;
+                return mTotalPages;
             }
 
             @Override
             public boolean isLastPage() {
-                return isLastPage;
+                return mIsLastPage;
             }
 
             @Override
             public boolean isLoading() {
-                return isLoading;
+                return mIsLoading;
             }
         });
 
@@ -95,10 +95,10 @@ public class Categories extends Fragment {
         return view;
     }
 
-    public ArrayList<String> getProductsId(String id, String dbPath, int offset) {
+    public ArrayList<String> getProductsId(final String pId, final String pDbPath, final int pOffset) {
         ArrayList<String> productId = new ArrayList<>();
-        SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-        Cursor query = db.rawQuery("SELECT DISTINCT product_id FROM category_product WHERE category_id = '" + id + "' LIMIT 10 OFFSET '" + offset + "'", null);
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(pDbPath, null, SQLiteDatabase.OPEN_READONLY);
+        Cursor query = db.rawQuery("SELECT DISTINCT product_id FROM category_product WHERE category_id = '" + pId + "' LIMIT 10 OFFSET '" + pOffset + "'", null);
         query.moveToFirst();
         while (!query.isAfterLast()) {
             productId.add(query.getString(0));
@@ -112,25 +112,25 @@ public class Categories extends Fragment {
 
     private void loadFirstPage() {
         Log.d("Loading...", "loadFirstPage: ");
-        List<Product> products = DBController.getProducts(dbPath, getProductsId(categoryId, dbPath, currentPage));
-        progressBar.setVisibility(View.GONE);
-        productAdapter.addAll(products);
+        List<Product> products = DBController.getProducts(mDbPath, getProductsId(mCategoryId, mDbPath, mCurrentPage));
+        mProgressBar.setVisibility(View.GONE);
+        mProductAdapter.addAll(products);
 
-        if (currentPage <= TOTAL_PAGES) productAdapter.addLoadingFooter();
-        else isLastPage = true;
+        if (mCurrentPage <= mTotalPages) mProductAdapter.addLoadingFooter();
+        else mIsLastPage = true;
     }
 
     private void loadNextPage() {
-        Log.d("Loading...", "loadNextPage: " + currentPage);
-        List<Product> products = DBController.getProducts(dbPath, getProductsId(categoryId, dbPath, currentPage * 10));
+        Log.d("Loading...", "loadNextPage: " + mCurrentPage);
+        List<Product> products = DBController.getProducts(mDbPath, getProductsId(mCategoryId, mDbPath, mCurrentPage * 10));
 
-        productAdapter.removeLoadingFooter();
-        isLoading = false;
+        mProductAdapter.removeLoadingFooter();
+        mIsLoading = false;
 
-        productAdapter.addAll(products);
+        mProductAdapter.addAll(products);
 
-        if (currentPage != TOTAL_PAGES) productAdapter.addLoadingFooter();
-        else isLastPage = true;
+        if (mCurrentPage != mTotalPages) mProductAdapter.addLoadingFooter();
+        else mIsLastPage = true;
     }
 
     @Override

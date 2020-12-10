@@ -17,43 +17,43 @@ import ru.SidorenkovIvan.MyApplication.ui.Categories.Categories;
 
 public class HomeCategoriesAdapter extends RecyclerView.Adapter<HomeCategoriesAdapter.ViewHolder>{
     private final List<Category> mCategory;
-    private final FragmentManager fragmentManager;
+    private final FragmentManager mFragmentManager;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public Button homeCategoriesButton;
 
-        public ViewHolder(View itemView) {
-            super(itemView);
-            homeCategoriesButton = itemView.findViewById(R.id.homeCategoriesButton);
+        public ViewHolder(final View pItemView) {
+            super(pItemView);
+            homeCategoriesButton = pItemView.findViewById(R.id.homeCategoriesButton);
         }
     }
 
-    public HomeCategoriesAdapter(FragmentManager manager, List<Category> categories) {
-        fragmentManager = manager;
-        mCategory = categories;
+    public HomeCategoriesAdapter(FragmentManager pFragmentManager, List<Category> pCategories) {
+        mFragmentManager = pFragmentManager;
+        mCategory = pCategories;
     }
 
     @Override
-    public int getItemViewType(final int position) {
+    public int getItemViewType(final int pPosition) {
         return R.layout.item_home;
     }
 
     @NotNull
     @Override
-    public HomeCategoriesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
+    public HomeCategoriesAdapter.ViewHolder onCreateViewHolder(final ViewGroup pParent, final int pViewType) {
+        Context context = pParent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View catalogView = inflater.inflate(R.layout.item_home, parent, false);
+        View catalogView = inflater.inflate(R.layout.item_home, pParent, false);
 
         return new ViewHolder(catalogView);
     }
 
     @Override
-    public void onBindViewHolder(HomeCategoriesAdapter.ViewHolder holder, int position) {
-        Category category = mCategory.get(position);
+    public void onBindViewHolder(final HomeCategoriesAdapter.ViewHolder pHolder, final int pPosition) {
+        Category category = mCategory.get(pPosition);
         String title = category.getTitle();
 
-        Button button = holder.homeCategoriesButton;
+        Button button = pHolder.homeCategoriesButton;
         button.setText(title);
 
         button.setOnClickListener(v -> {
@@ -62,7 +62,7 @@ public class HomeCategoriesAdapter extends RecyclerView.Adapter<HomeCategoriesAd
             bundle.putString("categoryID", category.getId());
             bundle.putString("categoryTitle", title);
             categories.setArguments(bundle);
-            Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, categories).addToBackStack(null).commit();
+            Objects.requireNonNull(mFragmentManager).beginTransaction().replace(R.id.nav_host_fragment, categories).addToBackStack(null).commit();
         });
     }
 

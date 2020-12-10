@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 
 public class Product implements Serializable {
+
     private String mId;
     private Bitmap mImage;
     private String mTitle;
@@ -18,64 +19,64 @@ public class Product implements Serializable {
         return mId;
     }
 
-    public void setId(String id) {
-        mId = id;
+    public void setId(final String pId) {
+        mId = pId;
     }
 
     public Bitmap getImage() {
         return mImage;
     }
 
-    public void setImage(Bitmap image) {
-        mImage = image;
+    public void setImage(final Bitmap pImage) {
+        mImage = pImage;
     }
 
     public String getTitle() {
         return mTitle;
     }
 
-    public void setTitle(String title) {
-        mTitle = title;
+    public void setTitle(final String pTitle) {
+        mTitle = pTitle;
     }
 
     public String getProductUrl() {
         return mProductUrl;
     }
 
-    public void setProductUrl(String productUrl) {
-        mProductUrl = productUrl;
+    public void setProductUrl(final String pProductUrl) {
+        mProductUrl = pProductUrl;
     }
 
     public String getDescription() {
         return mDescription;
     }
 
-    public void setDescription(String description) {
-        mDescription = description;
+    public void setDescription(final String pDescription) {
+        mDescription = pDescription;
     }
 
     public String getImages() {
         return mImages;
     }
 
-    public void setImages(String images) {
-        mImages = images;
+    public void setImages(final String pImages) {
+        mImages = pImages;
     }
 
     public String getCode() {
         return mCode;
     }
 
-    public void setCode(String code) {
-        mCode = code;
+    public void setCode(final String pCode) {
+        mCode = pCode;
     }
 
     public String getPrice() {
         return mPrice;
     }
 
-    public void setPrice(String price) {
-        mPrice = price;
+    public void setPrice(final String pPrice) {
+        mPrice = pPrice;
     }
 
     @NotNull

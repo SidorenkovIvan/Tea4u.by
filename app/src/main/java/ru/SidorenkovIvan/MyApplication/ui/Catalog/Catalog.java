@@ -18,7 +18,7 @@ import ru.SidorenkovIvan.MyApplication.R;
 
 public class Catalog extends Fragment {
 
-    private static final String DBname = "data.sqlite";
+    private static final String mDbName = "data.sqlite";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -28,7 +28,7 @@ public class Catalog extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         FragmentManager fragmentManager = getFragmentManager();
 
-        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
+        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + mDbName;
         List<Category> category = DBController.getNotEmptyCategories(dbPath);
 
         CatalogAdapter catalogAdapter = new CatalogAdapter(fragmentManager, category);

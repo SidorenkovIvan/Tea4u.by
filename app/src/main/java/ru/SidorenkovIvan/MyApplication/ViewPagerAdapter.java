@@ -2,7 +2,7 @@ package ru.SidorenkovIvan.MyApplication;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,17 +12,13 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
 public class ViewPagerAdapter extends PagerAdapter {
-    private final Context context;
-    private final ArrayList<Bitmap> bitmaps;
 
-    public ViewPagerAdapter(Context context, ArrayList<Bitmap> bitmaps) {
-        this.context = context;
-        this.bitmaps = bitmaps;
-    }
+    private final Context mContext;
+    private final ArrayList<BitmapDrawable> mBitmapDrawables;
 
-    @Override
-    public int getCount() {
-        return bitmaps.size();
+    public ViewPagerAdapter(final Context pContext) {
+        mContext = pContext;
+        mBitmapDrawables = new ArrayList<>();
     }
 
     @Override
@@ -34,10 +30,10 @@ public class ViewPagerAdapter extends PagerAdapter {
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        PhotoView imageView = new PhotoView(context);
+        PhotoView imageView = new PhotoView(mContext);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         imageView.setAdjustViewBounds(true);
-        imageView.setImageBitmap(bitmaps.get(position));
+        imageView.setImageBitmap(mBitmapDrawables.get(position).getBitmap());
         container.addView(imageView, 0);
         return imageView;
     }
@@ -45,5 +41,15 @@ public class ViewPagerAdapter extends PagerAdapter {
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         container.removeView((ImageView) object);
+    }
+
+    @Override
+    public int getCount() {
+        return mBitmapDrawables.size();
+    }
+
+    public void add(final BitmapDrawable pBitmapDrawable) {
+        mBitmapDrawables.add(pBitmapDrawable);
+        notifyDataSetChanged();
     }
 }

@@ -31,66 +31,66 @@ import ru.SidorenkovIvan.MyApplication.ui.Categories.ProductAdapter;
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "MyApp";
-    private static final String DBname = "data.sqlite";
-    private String dbPath;
+    private static final String mDbName = "data.sqlite";
+    private String mDbPath;
 
-    private ProductAdapter productAdapter;
-    private ProgressBar progressBar;
+    private ProductAdapter mProductAdapter;
+    private ProgressBar mProgressBar;
 
-    private boolean isLoading;
-    private boolean isLastPage;
-    private final int TOTAL_PAGES = 1;
-    private int currentPage;
+    private boolean mIsLoading;
+    private boolean mIsLastPage;
+    private final int mTotalPages = 1;
+    private int mCurrentPage;
 
     @SuppressLint("ResourceType")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
+        mDbPath = requireContext().getApplicationInfo().dataDir + "/" + mDbName;
         FragmentManager fragmentManager = getFragmentManager();
-        currentPage = 0;
-        isLoading = false;
-        isLastPage = false;
+        mCurrentPage = 0;
+        mIsLoading = false;
+        mIsLastPage = false;
 
         //Categories buttons
         RecyclerView RecyclerViewCategories = view.findViewById(R.id.recyclerViewSmallCategories);
-        List<Category> categories = DBController.getNotEmptyCategories(dbPath);
+        List<Category> categories = DBController.getNotEmptyCategories(mDbPath);
         HomeCategoriesAdapter catAdapter = new HomeCategoriesAdapter(fragmentManager, categories);
         RecyclerViewCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         RecyclerViewCategories.setAdapter(catAdapter);
 
         //Find new products in shop
         RecyclerView recyclerViewProducts = view.findViewById(R.id.recyclerViewNewProducts);
-        progressBar = view.findViewById(R.id.home_progress);
+        mProgressBar = view.findViewById(R.id.home_progress);
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
         recyclerViewProducts.setLayoutManager(layoutManager);
 
-        productAdapter = new ProductAdapter(fragmentManager);
-        recyclerViewProducts.setAdapter(productAdapter);
+        mProductAdapter = new ProductAdapter(fragmentManager);
+        recyclerViewProducts.setAdapter(mProductAdapter);
 
         recyclerViewProducts.addOnScrollListener(new PaginationScrollListener(layoutManager) {
             @Override
             protected void loadMoreItems() {
-                isLoading = true;
-                currentPage += 1;
+                mIsLoading = true;
+                mCurrentPage += 1;
 
                 new Handler().postDelayed(() -> loadNextPage(), 100);
             }
 
             @Override
             public int getTotalPageCount() {
-                return TOTAL_PAGES;
+                return mTotalPages;
             }
 
             @Override
             public boolean isLastPage() {
-                return isLastPage;
+                return mIsLastPage;
             }
 
             @Override
             public boolean isLoading() {
-                return isLoading;
+                return mIsLoading;
             }
         });
 
@@ -99,11 +99,11 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    private ArrayList<String> getProductsId(int offset) {
+    private ArrayList<String> getProductsId(final int pOffset) {
         ArrayList<String> newProductsId = new ArrayList<>();
-        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
+        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + mDbName;
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-        Cursor query = db.rawQuery("SELECT product.product_id FROM product INNER JOIN latest ON product.product_id = latest.product_id LIMIT 10 OFFSET '" + offset + "'", null);
+        Cursor query = db.rawQuery("SELECT product.product_id FROM product INNER JOIN latest ON product.product_id = latest.product_id LIMIT 10 OFFSET '" + pOffset + "'", null);
         query.moveToFirst();
         while (!query.isAfterLast()) {
             newProductsId.add(query.getString(0));
@@ -118,26 +118,26 @@ public class HomeFragment extends Fragment {
 
     private void loadFirstPage() {
         Log.d("Loading...", "loadFirstPage: ");
-        List<Product> products = DBController.getProducts(dbPath, getProductsId(currentPage));
-        progressBar.setVisibility(View.GONE);
-        productAdapter.addAll(products);
+        List<Product> products = DBController.getProducts(mDbPath, getProductsId(mCurrentPage));
+        mProgressBar.setVisibility(View.GONE);
+        mProductAdapter.addAll(products);
 
-        if (currentPage <= TOTAL_PAGES) productAdapter.addLoadingFooter();
-        else isLastPage = true;
+        if (mCurrentPage <= mTotalPages) mProductAdapter.addLoadingFooter();
+        else mIsLastPage = true;
 
     }
 
     private void loadNextPage() {
-        Log.d("Loading...", "loadNextPage: " + currentPage);
-        List<Product> products = DBController.getProducts(dbPath, getProductsId(currentPage * 10));
+        Log.d("Loading...", "loadNextPage: " + mCurrentPage);
+        List<Product> products = DBController.getProducts(mDbPath, getProductsId(mCurrentPage * 10));
 
-        productAdapter.removeLoadingFooter();
-        isLoading = false;
+        mProductAdapter.removeLoadingFooter();
+        mIsLoading = false;
 
-        productAdapter.addAll(products);
+        mProductAdapter.addAll(products);
 
-        if (currentPage != TOTAL_PAGES) productAdapter.addLoadingFooter();
-        else isLastPage = true;
+        if (mCurrentPage != mTotalPages) mProductAdapter.addLoadingFooter();
+        else mIsLastPage = true;
     }
 
     @Override

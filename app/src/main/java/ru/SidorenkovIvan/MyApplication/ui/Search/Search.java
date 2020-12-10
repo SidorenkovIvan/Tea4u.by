@@ -3,7 +3,6 @@ package ru.SidorenkovIvan.MyApplication.ui.Search;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,16 +25,16 @@ import ru.SidorenkovIvan.MyApplication.R;
 public class Search extends Fragment {
 
     private final String TAG = "MyApp";
-    private String dbPath;
-    private String text;
+    private String mDbPath;
+    private String mText;
 
-    private SearchAdapter searchAdapter;
-    private ProgressBar progressBar;
+    private SearchAdapter mSearchAdapter;
+    private ProgressBar mProgressBar;
 
-    private boolean isLoading;
-    private boolean isLastPage;
-    private final int TOTAL_PAGES = 15;
-    private int currentPage;
+    private boolean mIsLoading;
+    private boolean mIsLastPage;
+    private final int mTotalPages = 15;
+    private int mCurrentPage;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -44,44 +43,44 @@ public class Search extends Fragment {
 
         SearchView searchView = view.findViewById(R.id.searchView);
         FragmentManager fragmentManager = getFragmentManager();
-        dbPath = requireContext().getApplicationInfo().dataDir + "/" + "data.sqlite";
-        currentPage = 0;
-        isLoading = false;
-        isLastPage = false;
+        mDbPath = requireContext().getApplicationInfo().dataDir + "/" + "data.sqlite";
+        mCurrentPage = 0;
+        mIsLoading = false;
+        mIsLastPage = false;
 
         RecyclerView recyclerViewSearch = view.findViewById(R.id.recyclerViewSearch);
-        progressBar = view.findViewById(R.id.searchProgressBar);
+        mProgressBar = view.findViewById(R.id.searchProgressBar);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerViewSearch.setLayoutManager(layoutManager);
 
-        searchAdapter = new SearchAdapter(fragmentManager);
-        recyclerViewSearch.setAdapter(searchAdapter);
+        mSearchAdapter = new SearchAdapter(fragmentManager);
+        recyclerViewSearch.setAdapter(mSearchAdapter);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                Log.i(TAG, "onQueryTextSubmit: " + query);
+            public boolean onQueryTextSubmit(final String pQuery) {
+                Log.i(TAG, "onQueryTextSubmit: " + pQuery);
 
-                searchAdapter = new SearchAdapter(fragmentManager);
-                recyclerViewSearch.setAdapter(searchAdapter);
-                text = query;
-                currentPage = 0;
+                mSearchAdapter = new SearchAdapter(fragmentManager);
+                recyclerViewSearch.setAdapter(mSearchAdapter);
+                mText = pQuery;
+                mCurrentPage = 0;
 
-                loadFirstPage(text);
+                loadFirstPage(mText);
 
                 return false;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                Log.i(TAG, "onQueryTextChange: " + newText);
+            public boolean onQueryTextChange(final String pNewText) {
+                Log.i(TAG, "onQueryTextChange: " + pNewText);
 
-                searchAdapter = new SearchAdapter(fragmentManager);
-                recyclerViewSearch.setAdapter(searchAdapter);
-                text = newText;
-                currentPage = 0;
+                mSearchAdapter = new SearchAdapter(fragmentManager);
+                recyclerViewSearch.setAdapter(mSearchAdapter);
+                mText = pNewText;
+                mCurrentPage = 0;
 
-                loadFirstPage(text);
+                loadFirstPage(mText);
 
                 return false;
             }
@@ -90,36 +89,36 @@ public class Search extends Fragment {
         recyclerViewSearch.addOnScrollListener(new PaginationScrollListener(layoutManager) {
             @Override
             protected void loadMoreItems() {
-                isLoading = true;
-                currentPage += 1;
+                mIsLoading = true;
+                mCurrentPage += 1;
 
-                new Handler().postDelayed(() -> loadNextPage(text), 500);
+                loadNextPage(mText);
             }
 
             @Override
             public int getTotalPageCount() {
-                return TOTAL_PAGES;
+                return mTotalPages;
             }
 
             @Override
             public boolean isLastPage() {
-                return isLastPage;
+                return mIsLastPage;
             }
 
             @Override
             public boolean isLoading() {
-                return isLoading;
+                return mIsLoading;
             }
         });
 
         return view;
     }
 
-    private ArrayList<Product> search(String keyword, int offset) {
+    private ArrayList<Product> search(final String pKeyword, final int pOffset) {
         ArrayList<Product> products = new ArrayList<>();
-        SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-        Cursor cursor = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE productTitle LIKE ? LIMIT 15 OFFSET '" + offset + "'", new String[]{"%" + keyword + "%"});
-        Cursor cursor1 = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE code LIKE ? LIMIT 15 OFFSET '" + offset + "'", new String[]{"%" + keyword + "%"});
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(mDbPath, null, SQLiteDatabase.OPEN_READONLY);
+        Cursor cursor = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE productTitle LIKE ? LIMIT 15 OFFSET '" + pOffset + "'", new String[]{"%" + pKeyword + "%"});
+        Cursor cursor1 = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE code LIKE ? LIMIT 15 OFFSET '" + pOffset + "'", new String[]{"%" + pKeyword + "%"});
         if (cursor.moveToFirst()) {
             do {
                 Product product = new Product();
@@ -130,6 +129,7 @@ public class Search extends Fragment {
             } while (cursor.moveToNext());
 
             cursor.close();
+            cursor1.close();
             db.close();
 
             return products;
@@ -142,6 +142,7 @@ public class Search extends Fragment {
                 products.add(product);
             } while (cursor1.moveToNext());
 
+            cursor.close();
             cursor1.close();
             db.close();
 
@@ -153,36 +154,44 @@ public class Search extends Fragment {
             product.setCode("");
             products.add(product);
 
-            isLoading = false;
-            isLastPage = true;
-            currentPage = TOTAL_PAGES;
+            mIsLoading = false;
+            mIsLastPage = true;
+            mCurrentPage = mTotalPages;
+
+            cursor.close();
+            cursor1.close();
+            db.close();
 
             return products;
         }
     }
 
-    private void loadFirstPage(String newText) {
+    private void loadFirstPage(final String pText) {
         Log.d("Loading...", "loadFirstPage: ");
-        List<Product> products = search(newText, currentPage);
-        progressBar.setVisibility(View.GONE);
-        searchAdapter.addAll(products);
+        List<Product> products = search(pText, mCurrentPage);
+        mProgressBar.setVisibility(View.GONE);
+        mSearchAdapter.addAll(products);
 
-        Log.d("Products count", String.valueOf(searchAdapter.getItemCount()));
-        if (currentPage < TOTAL_PAGES && searchAdapter.getItemCount() >= 15) searchAdapter.addLoadingFooter();
-        else isLastPage = true;
+        Log.d("Products count", String.valueOf(mSearchAdapter.getItemCount()));
+        if (mCurrentPage < mTotalPages && mSearchAdapter.getItemCount() >= 15)
+            mSearchAdapter.addLoadingFooter();
+        else
+            mIsLastPage = true;
     }
 
-    private void loadNextPage(String newText) {
-        Log.d("Loading...", "loadNextPage: " + currentPage);
-        List<Product> products = search(newText, currentPage * 15);
+    private void loadNextPage(final String pText) {
+        Log.d("Loading...", "loadNextPage: " + mCurrentPage);
+        List<Product> products = search(pText, mCurrentPage * 15);
 
-        searchAdapter.removeLoadingFooter();
-        isLoading = false;
+        mSearchAdapter.removeLoadingFooter();
+        mIsLoading = false;
 
-        searchAdapter.addAll(products);
+        mSearchAdapter.addAll(products);
 
-        if (currentPage != TOTAL_PAGES) searchAdapter.addLoadingFooter();
-        else isLastPage = true;
+        if (mCurrentPage != mTotalPages)
+            mSearchAdapter.addLoadingFooter();
+        else
+            mIsLastPage = true;
     }
 
     @Override

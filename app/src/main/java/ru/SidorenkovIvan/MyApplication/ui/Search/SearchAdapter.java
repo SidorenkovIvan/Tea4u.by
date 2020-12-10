@@ -17,31 +17,32 @@ import ru.SidorenkovIvan.MyApplication.R;
 import ru.SidorenkovIvan.MyApplication.ui.ProductPage.ProductPage;
 
 public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
     private final List<Product> mProducts;
-    private final FragmentManager fragmentManager;
+    private final FragmentManager mFragmentManager;
 
-    private boolean isLoadingAdded = false;
+    private boolean mIsLoadingAdded = false;
 
-    private static final int ITEM = 0;
-    private static final int LOADING = 1;
+    private final int ITEM = 0;
+    private final int LOADING = 1;
 
-    public SearchAdapter (FragmentManager manager) {
-        fragmentManager = manager;
+    public SearchAdapter (final FragmentManager pFragmentManager) {
+        mFragmentManager = pFragmentManager;
         mProducts = new ArrayList<>();
     }
 
     @NotNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final ViewGroup pParent, final int pViewType) {
+        LayoutInflater inflater = LayoutInflater.from(pParent.getContext());
         RecyclerView.ViewHolder viewHolder = null;
 
-        switch (viewType) {
+        switch (pViewType) {
             case ITEM:
-                viewHolder = getViewHolder(parent, inflater);
+                viewHolder = getViewHolder(pParent, inflater);
                 break;
             case LOADING:
-                View viewProgress = inflater.inflate(R.layout.item_progress, parent, false);
+                View viewProgress = inflater.inflate(R.layout.item_progress, pParent, false);
                 viewHolder = new LoadingVH(viewProgress);
                 break;
         }
@@ -49,20 +50,20 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return Objects.requireNonNull(viewHolder);
     }
 
-    private RecyclerView.ViewHolder getViewHolder(ViewGroup parent, LayoutInflater inflater) {
+    private RecyclerView.ViewHolder getViewHolder(final ViewGroup pParent, final LayoutInflater pInflater) {
         RecyclerView.ViewHolder viewHolder;
-        View view = inflater.inflate(R.layout.item_search, parent, false);
+        View view = pInflater.inflate(R.layout.item_search, pParent, false);
         viewHolder = new ProductVH(view);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Product product = mProducts.get(position);
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder pHolder, final int pPosition) {
+        Product product = mProducts.get(pPosition);
 
-        switch (getItemViewType(position)) {
+        switch (getItemViewType(pPosition)) {
             case ITEM:
-                ProductVH productVH = (ProductVH) holder;
+                ProductVH productVH = (ProductVH) pHolder;
                 productVH.buttonSearchProduct.setText(product.toString());
 
                 productVH.buttonSearchProduct.setOnClickListener(v -> {
@@ -70,7 +71,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     Bundle bundle = new Bundle();
                     bundle.putString("productID", product.getId());
                     productPage.setArguments(bundle);
-                    Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, productPage).addToBackStack(null).commit();
+                    Objects.requireNonNull(mFragmentManager).beginTransaction().replace(R.id.nav_host_fragment, productPage).addToBackStack(null).commit();
                 });
                 break;
             case LOADING:
@@ -79,17 +80,17 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     @Override
-    public int getItemViewType(int position) {
-        return (position == mProducts.size() - 1 && isLoadingAdded) ? LOADING : ITEM;
+    public int getItemViewType(final int pPosition) {
+        return (pPosition == mProducts.size() - 1 && mIsLoadingAdded) ? LOADING : ITEM;
     }
 
     public void addLoadingFooter() {
-        isLoadingAdded = true;
+        mIsLoadingAdded = true;
         add(new Product());
     }
 
     public void removeLoadingFooter() {
-        isLoadingAdded = false;
+        mIsLoadingAdded = false;
 
         int position = mProducts.size() - 1;
         Product item = getItem(position);
@@ -100,19 +101,19 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    public void add(Product mc) {
-        mProducts.add(mc);
+    public void add(final Product pProduct) {
+        mProducts.add(pProduct);
         notifyItemInserted(mProducts.size() - 1);
     }
 
-    public void addAll(List<Product> productList) {
-        for (Product product : productList) {
+    public void addAll(final List<Product> pProductList) {
+        for (Product product : pProductList) {
             add(product);
         }
     }
 
-    public Product getItem(int position) {
-        return mProducts.get(position);
+    public Product getItem(final int pPosition) {
+        return mProducts.get(pPosition);
     }
 
 
@@ -124,16 +125,16 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public static class ProductVH extends RecyclerView.ViewHolder {
         public Button buttonSearchProduct;
 
-        public ProductVH(View itemView) {
-            super(itemView);
-            buttonSearchProduct = itemView.findViewById(R.id.buttonSearchProduct);
+        public ProductVH(final View pItemView) {
+            super(pItemView);
+            buttonSearchProduct = pItemView.findViewById(R.id.buttonSearchProduct);
         }
     }
 
     protected static class LoadingVH extends RecyclerView.ViewHolder {
 
-        public LoadingVH(View itemView) {
-            super(itemView);
+        public LoadingVH(final View pItemView) {
+            super(pItemView);
         }
     }
 }

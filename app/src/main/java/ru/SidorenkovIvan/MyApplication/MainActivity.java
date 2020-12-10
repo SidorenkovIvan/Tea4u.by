@@ -25,9 +25,10 @@ import static androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String FRAGMENT_HOME = "home";
-    private static final String FRAGMENT_OTHER = "other";
-    private BottomNavigationView navigationView;
+    private final String FRAGMENT_HOME = "home";
+    private final String FRAGMENT_OTHER = "other";
+    private BottomNavigationView mNavigationView;
+    private static ImageLoader mImageLoader;
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -40,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(findViewById(R.id.custom_toolbar));
 
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setOnNavigationItemSelectedListener(item -> {
+        mNavigationView = findViewById(R.id.nav_view);
+        mNavigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_home:
                     viewFragment(new HomeFragment(), FRAGMENT_HOME);
@@ -57,6 +58,15 @@ public class MainActivity extends AppCompatActivity {
         });
 
         initAlertDialog();
+        initImageLoader();
+    }
+
+    private void initImageLoader() {
+        mImageLoader = new ImageLoader(this);
+    }
+
+    public static ImageLoader getImageLoader() {
+        return mImageLoader;
     }
 
     @SuppressLint("SetTextI18n")
@@ -125,17 +135,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void initButtons(View view) {
-        Button buttonSite = view.findViewById(R.id.buttonSite);
-        Button buttonSiteT = view.findViewById(R.id.buttonTextSite);
-        Button buttonVk = view.findViewById(R.id.buttonVK);
-        Button buttonVkT = view.findViewById(R.id.buttonTextVK);
-        Button buttonInstagram = view.findViewById(R.id.buttonInstagram);
-        Button buttonInstagramT = view.findViewById(R.id.buttonTextInstagram);
-        Button buttonCall = view.findViewById(R.id.buttonCall);
-        Button buttonCallT = view.findViewById(R.id.buttonCallText);
-        Button buttonViber = view.findViewById(R.id.buttonViber);
-        Button buttonViberT = view.findViewById(R.id.buttonViberText);
+    private void initButtons(final View pView) {
+        Button buttonSite = pView.findViewById(R.id.buttonSite);
+        Button buttonSiteT = pView.findViewById(R.id.buttonTextSite);
+        Button buttonVk = pView.findViewById(R.id.buttonVK);
+        Button buttonVkT = pView.findViewById(R.id.buttonTextVK);
+        Button buttonInstagram = pView.findViewById(R.id.buttonInstagram);
+        Button buttonInstagramT = pView.findViewById(R.id.buttonTextInstagram);
+        Button buttonCall = pView.findViewById(R.id.buttonCall);
+        Button buttonCallT = pView.findViewById(R.id.buttonCallText);
+        Button buttonViber = pView.findViewById(R.id.buttonViber);
+        Button buttonViberT = pView.findViewById(R.id.buttonViberText);
 
         buttonSite.setOnClickListener(this::onClick);
         buttonSiteT.setOnClickListener(this::onClick);
@@ -150,8 +160,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("NonConstantResourceId")
-    public void onClick(View view) {
-        switch (view.getId()) {
+    public void onClick(final View pView) {
+        switch (pView.getId()) {
             case R.id.buttonSite:
             case R.id.buttonTextSite:
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://tea4u.by")));
@@ -175,24 +185,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sendEmail(String phone, String name) {
+    private void sendEmail(final String pPhone, final String pName) {
         String mail = "info@tea4u.by";
         String subject = "Обратный звонок от приложения";
-        String messageToEmail = "Телефон: " + phone + "\n" + "Имя: " + name;
+        String messageToEmail = "Телефон: " + pPhone + "\n" + "Имя: " + pName;
 
         JavaMailAPI javaMailAPI = new JavaMailAPI(this, mail, subject, messageToEmail);
         javaMailAPI.execute();
     }
 
-    private void viewFragment(Fragment fragment, String name) {
+    private void viewFragment(final Fragment pFragment, final String pName) {
         final FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.replace(R.id.nav_host_fragment, pFragment);
         fragmentTransaction.setReorderingAllowed(true);
 
         final int count = fragmentManager.getBackStackEntryCount();
-        if (name.equals(FRAGMENT_OTHER)) {
-            fragmentTransaction.addToBackStack(name);
+        if (pName.equals(FRAGMENT_OTHER)) {
+            fragmentTransaction.addToBackStack(pName);
         }
         fragmentTransaction.commit();
 
@@ -202,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                 if (fragmentManager.getBackStackEntryCount() <= count) {
                     fragmentManager.popBackStack(FRAGMENT_OTHER, POP_BACK_STACK_INCLUSIVE);
                     fragmentManager.removeOnBackStackChangedListener(this);
-                    navigationView.getMenu().getItem(0).setChecked(true);
+                    mNavigationView.getMenu().getItem(0).setChecked(true);
                 }
             }
         });
