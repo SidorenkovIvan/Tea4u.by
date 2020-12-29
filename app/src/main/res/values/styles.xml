@@ -12,9 +12,11 @@
         <item name="colorAccent">@color/colorForSmallCategories</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+    <style name="CustomText" parent="@style/TextAppearance.AppCompat" >
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="fontFamily">@font/opensans</item>
+        <item name="textAllCaps">false</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

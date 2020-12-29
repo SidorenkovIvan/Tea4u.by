@@ -31,12 +31,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final String DBname = "data.sqlite";
+    private static final String mDbName = "data.sqlite";
     private static final String TAG = "MyApp";
-    private ProgressBar progressBar;
-    private String[] teaTitles = {"Завариваем чай...", "Чайник кипит...", "Загружаем новые чаи...",
-            "Переходим на чайную сторону...", "Готовим чайную церемонию...", "Собираем чай для Вас...",
-            "Промываем заварник...", "Выбираем чашку...", "Покупаем сладости к чаю..."};
+    private ProgressBar mProgressBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,18 +43,20 @@ public class SplashActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        progressBar = findViewById(R.id.progressBarSplash);
+        mProgressBar = findViewById(R.id.progressBarSplash);
 
         TextView textViewForProgressBar = findViewById(R.id.textViewForProgressBar);
+
+        String[] splashTitles = getResources().getStringArray(R.array.splash_titles);
         int random = new Random().nextInt(9);
-        textViewForProgressBar.setText(teaTitles[random]);
+        textViewForProgressBar.setText(splashTitles[random]);
 
         new Thread(this::workWithDatabase).start();
     }
 
 
     private void workWithDatabase() {
-        String dbPath = getApplicationInfo().dataDir + "/" + DBname;
+        String dbPath = getApplicationInfo().dataDir + "/" + mDbName;
         File dbFile = new File(dbPath);
 
         Log.i(TAG, String.valueOf(dbFile.length()));
@@ -67,7 +66,7 @@ public class SplashActivity extends AppCompatActivity {
                 if (!dbFile.exists()) {
                     Log.i(TAG, "Saving database");
                     saveDatabase();
-                } else if (dbFile.exists() && dbFile.length() < 3000000) {
+                } else if (dbFile.exists() && dbFile.length() < 3400000) {
                     deleteDatabase();
                     Log.i(TAG, "Saving database");
                     saveDatabase();
@@ -80,8 +79,8 @@ public class SplashActivity extends AppCompatActivity {
                         Log.i(TAG, "Saving new database");
                         saveDatabase();
                     } else {
-                        progressBar.setMax(100);
-                        progressBar.setProgress(100);
+                        mProgressBar.setMax(100);
+                        mProgressBar.setProgress(100);
                         Log.i(TAG, "Database is correct on ur phone");
                     }
                 }
@@ -117,7 +116,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private String getLocalHash() {
-        String dbPath = getApplicationInfo().dataDir + "/" + DBname;
+        String dbPath = getApplicationInfo().dataDir + "/" + mDbName;
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
         Cursor query = db.rawQuery("SELECT hash FROM hash_table", null);
         query.moveToFirst();
@@ -147,7 +146,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void deleteDatabase() {
-        String dbPath = getApplicationInfo().dataDir + "/" + DBname;
+        String dbPath = getApplicationInfo().dataDir + "/" + mDbName;
         File old = new File(dbPath);
         boolean deleted = old.delete();
         Log.i(TAG, "Is old file delete: " + deleted);
@@ -155,7 +154,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void saveDatabase() {
         try {
-            String dbPath = getApplicationInfo().dataDir + "/" + DBname;
+            String dbPath = getApplicationInfo().dataDir + "/" + mDbName;
             URL url = new URL(getString(R.string.download_database_API));
             URLConnection connection = url.openConnection();
             connection.connect();
@@ -169,15 +168,14 @@ public class SplashActivity extends AppCompatActivity {
                 byte[] data = new byte[1024];
                 long total = 0;
                 int byteContent;
-                progressBar.setMax(333800000);
+                mProgressBar.setMax(343800000);
                 while ((byteContent = inputStream.read(data, 0, 1024)) != -1) {
                     total += byteContent;
                     Log.i(TAG, String.valueOf((int) (total * 100 / fileLength)));
-                    progressBar.setProgress((int) (total * 100 / fileLength));
+                    mProgressBar.setProgress((int) (total * 100 / fileLength));
                     fileOS.write(data, 0, byteContent);
                 }
             } catch (IOException ignored) {
-
             }
         } catch (IOException e) {
             Log.i(TAG, "Something wrong with saving database");

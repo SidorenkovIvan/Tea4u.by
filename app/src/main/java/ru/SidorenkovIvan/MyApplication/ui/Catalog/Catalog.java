@@ -1,103 +1,42 @@
 package ru.SidorenkovIvan.MyApplication.ui.Catalog;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import ru.SidorenkovIvan.MyApplication.R;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
-import ru.SidorenkovIvan.MyApplication.ui.Categories.Categories;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import ru.SidorenkovIvan.MyApplication.Category;
+import ru.SidorenkovIvan.MyApplication.DBController;
+import ru.SidorenkovIvan.MyApplication.R;
 
 public class Catalog extends Fragment {
 
-    private static final String DBname = "data.sqlite";
-    private ArrayList<String> categoryID = new ArrayList<>();
-    private ArrayList<String> categoryTitle = new ArrayList<>();
-
+    private static final String mDbName = "data.sqlite";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Typeface typeface = ResourcesCompat.getFont(requireContext(), R.font.opensans);
-        int textColor = ContextCompat.getColor(requireContext(), R.color.textColor);
+        View view = inflater.inflate(R.layout.catalog_fragment, container, false);
 
-        ScrollView scrollView = new ScrollView(getContext());
-        scrollView.setBackgroundColor(Color.WHITE);
-        LinearLayout linearLayoutForAll = new LinearLayout(getActivity());
-        linearLayoutForAll.setOrientation(LinearLayout.VERTICAL);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        FragmentManager fragmentManager = getFragmentManager();
 
-        //Params for Buttons
-        layoutParamsForButtons.setMargins(0, 20, 0, 0);
+        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + mDbName;
+        List<Category> category = DBController.getNotEmptyCategories(dbPath);
 
-        findCategoriesIdTit();
+        CatalogAdapter catalogAdapter = new CatalogAdapter(fragmentManager, category);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(catalogAdapter);
 
-        for (byte i = 0; i < categoryID.size(); i++) {
-            Button button = new Button(getContext());
-            button.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-            button.setTextSize(16);
-            button.setBackgroundColor(Color.WHITE);
-            button.setTextColor(textColor);
-            button.setTypeface(typeface);
-            button.setText(categoryTitle.get(i));
-            button.setAllCaps(false);
-            button.setStateListAnimator(null);
-            button.setPadding(80, 0, 80, 0);
-
-            byte finalI = i;
-            button.setOnClickListener(v -> {
-                Categories categories = new Categories();
-                Bundle bundle = new Bundle();
-                bundle.putString("categoryID", categoryID.get(finalI));
-                bundle.putString("categoryTitle", categoryTitle.get(finalI));
-                categories.setArguments(bundle);
-                FragmentManager fragmentManager = getFragmentManager();
-                Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, categories).addToBackStack(null).commit();
-            });
-
-            linearLayoutForAll.addView(button, layoutParamsForButtons);
-        }
-
-        scrollView.addView(linearLayoutForAll);
-
-        return scrollView;
+        return view;
     }
-
-    private void findCategoriesIdTit() {
-        categoryID.clear();
-        categoryTitle.clear();
-        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
-        SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-        Cursor query = db.rawQuery("SELECT DISTINCT category.category_id, category.title FROM category INNER JOIN category_product ON category_product.category_id = category.category_id", null);
-        query.moveToFirst();
-        while (!query.isAfterLast()) {
-            categoryID.add(query.getString(0));
-            categoryTitle.add(query.getString(1));
-            query.moveToNext();
-        }
-        query.close();
-        db.close();
-    }
-
-    private final LinearLayout.LayoutParams layoutParamsForButtons = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            1
-    );
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

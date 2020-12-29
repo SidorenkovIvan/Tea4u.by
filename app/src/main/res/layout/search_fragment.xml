@@ -8,6 +8,7 @@
     tools:context="ru.SidorenkovIvan.MyApplication.ui.Search.Search">
 
     <SearchView
+        style="@style/CustomText"
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,12 +21,17 @@
         android:searchIcon="@drawable/icon_search"
         android:queryHint="Введите название или код"/>
 
-    <ScrollView
-        android:id="@+id/scrollView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewSearch"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/white"
-        android:layout_marginHorizontal="28dp"
-        android:layout_marginTop="12dp"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"/>
+
+    <ProgressBar
+        android:id="@+id/searchProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
 
 </LinearLayout>

@@ -1,143 +1,197 @@
 package ru.SidorenkovIvan.MyApplication.ui.Search;
 
-import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.Fragment;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
-import android.widget.TextView;
-import java.util.Objects;
-import ru.SidorenkovIvan.MyApplication.R;
-import ru.SidorenkovIvan.MyApplication.ui.PageOfProduct.PageOfProduct;
+import java.util.ArrayList;
+import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import ru.SidorenkovIvan.MyApplication.PaginationScrollListener;
+import ru.SidorenkovIvan.MyApplication.Product;
+import ru.SidorenkovIvan.MyApplication.R;
 
 public class Search extends Fragment {
 
-    private static final String TAG = "MyApp";
-    private static final String DBname = "data.sqlite";
-    private ScrollView scrollView;
+    private final String TAG = "MyApp";
+    private String mDbPath;
+    private String mText;
+
+    private SearchAdapter mSearchAdapter;
+    private ProgressBar mProgressBar;
+
+    private boolean mIsLoading;
+    private boolean mIsLastPage;
+    private final int mTotalPages = 15;
+    private int mCurrentPage;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view =inflater.inflate(R.layout.search_fragment, container, false);
+        View view = inflater.inflate(R.layout.search_fragment, container, false);
 
         SearchView searchView = view.findViewById(R.id.searchView);
-        scrollView = view.findViewById(R.id.scrollView);
+        FragmentManager fragmentManager = getFragmentManager();
+        mDbPath = requireContext().getApplicationInfo().dataDir + "/" + "data.sqlite";
+        mCurrentPage = 0;
+        mIsLoading = false;
+        mIsLastPage = false;
+
+        RecyclerView recyclerViewSearch = view.findViewById(R.id.recyclerViewSearch);
+        mProgressBar = view.findViewById(R.id.searchProgressBar);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerViewSearch.setLayoutManager(layoutManager);
+
+        mSearchAdapter = new SearchAdapter(fragmentManager);
+        recyclerViewSearch.setAdapter(mSearchAdapter);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                Log.i(TAG, "onQueryTextSubmit: " + query);
-                search(query);
+            public boolean onQueryTextSubmit(final String pQuery) {
+                Log.i(TAG, "onQueryTextSubmit: " + pQuery);
+
+                mSearchAdapter = new SearchAdapter(fragmentManager);
+                recyclerViewSearch.setAdapter(mSearchAdapter);
+                mText = pQuery;
+                mCurrentPage = 0;
+
+                loadFirstPage(mText);
+
                 return false;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                Log.i(TAG, "onQueryTextChange: " + newText);
-                search(newText);
+            public boolean onQueryTextChange(final String pNewText) {
+                Log.i(TAG, "onQueryTextChange: " + pNewText);
+
+                mSearchAdapter = new SearchAdapter(fragmentManager);
+                recyclerViewSearch.setAdapter(mSearchAdapter);
+                mText = pNewText;
+                mCurrentPage = 0;
+
+                loadFirstPage(mText);
+
                 return false;
             }
         });
+
+        recyclerViewSearch.addOnScrollListener(new PaginationScrollListener(layoutManager) {
+            @Override
+            protected void loadMoreItems() {
+                mIsLoading = true;
+                mCurrentPage += 1;
+
+                loadNextPage(mText);
+            }
+
+            @Override
+            public int getTotalPageCount() {
+                return mTotalPages;
+            }
+
+            @Override
+            public boolean isLastPage() {
+                return mIsLastPage;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return mIsLoading;
+            }
+        });
+
         return view;
     }
 
-    private void search(String keyword) {
-        Typeface typeface = ResourcesCompat.getFont(requireContext(), R.font.opensans);
-        String dbPath = requireContext().getApplicationInfo().dataDir + "/" + DBname;
-        SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-        Cursor cursor = db.rawQuery("SELECT * FROM product WHERE productTitle like ?", new String[]{"%" + keyword + "%"});
-        Cursor cursor1 = db.rawQuery("SELECT * FROM product WHERE code like ?", new String[]{"%" + keyword + "%"});
+    private ArrayList<Product> search(final String pKeyword, final int pOffset) {
+        ArrayList<Product> products = new ArrayList<>();
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(mDbPath, null, SQLiteDatabase.OPEN_READONLY);
+        Cursor cursor = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE productTitle LIKE ? LIMIT 15 OFFSET '" + pOffset + "'", new String[]{"%" + pKeyword + "%"});
+        Cursor cursor1 = db.rawQuery("SELECT product.product_id, product.productTitle, product.code FROM product WHERE code LIKE ? LIMIT 15 OFFSET '" + pOffset + "'", new String[]{"%" + pKeyword + "%"});
         if (cursor.moveToFirst()) {
-            LinearLayout linearLayout = new LinearLayout(getContext());
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            linearLayout.setBackgroundColor(Color.WHITE);
             do {
-                scrollView.post(scrollView::removeAllViews);
                 Product product = new Product();
-                Button button = new Button(getContext());
                 product.setId(cursor.getString(0));
-                product.setName(cursor.getString(2));
-                product.setCode(cursor.getString(6));
-                button.setText(product.toString());
-                button.setAllCaps(false);
-                button.setTypeface(typeface);
-                button.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-                button.setBackgroundColor(Color.WHITE);
-                button.setPadding(20, 4, 20, 4);
-                button.setOnClickListener(v -> {
-                    PageOfProduct pageOfProduct = new PageOfProduct();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("productID", product.getId());
-                    pageOfProduct.setArguments(bundle);
-                    FragmentManager fragmentManager = getFragmentManager();
-                    Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
-                });
-                linearLayout.post(() -> linearLayout.addView(button));
+                product.setTitle(cursor.getString(1));
+                product.setCode(cursor.getString(2));
+                products.add(product);
             } while (cursor.moveToNext());
 
-            scrollView.post(() -> scrollView.addView(linearLayout));
+            cursor.close();
+            cursor1.close();
+            db.close();
+
+            return products;
         } else if (cursor1.moveToFirst()) {
-            LinearLayout linearLayout = new LinearLayout(getContext());
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            linearLayout.setBackgroundColor(Color.WHITE);
             do {
-                scrollView.post(scrollView::removeAllViews);
                 Product product = new Product();
-                Button button = new Button(getContext());
                 product.setId(cursor1.getString(0));
-                product.setName(cursor1.getString(2));
-                product.setCode(cursor1.getString(6));
-                button.setText(product.toString());
-                button.setAllCaps(false);
-                button.setTypeface(typeface);
-                button.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-                button.setBackgroundColor(Color.WHITE);
-                button.setPadding(20, 4, 20, 4);
-                button.setOnClickListener(v -> {
-                    PageOfProduct pageOfProduct = new PageOfProduct();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("productID", product.getId());
-                    pageOfProduct.setArguments(bundle);
-                    FragmentManager fragmentManager = getFragmentManager();
-                    Objects.requireNonNull(fragmentManager).beginTransaction().replace(R.id.nav_host_fragment, pageOfProduct).addToBackStack(null).commit();
-                });
-                linearLayout.post(() -> linearLayout.addView(button));
+                product.setTitle(cursor1.getString(1));
+                product.setCode(cursor1.getString(2));
+                products.add(product);
             } while (cursor1.moveToNext());
 
-            scrollView.post(() -> scrollView.addView(linearLayout));
+            cursor.close();
+            cursor1.close();
+            db.close();
+
+            return products;
         } else {
-            scrollView.post(scrollView::removeAllViews);
-            LinearLayout linearLayout = new LinearLayout(getContext());
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            linearLayout.setBackgroundColor(Color.WHITE);
+            Product product = new Product();
+            product.setId("");
+            product.setTitle("");
+            product.setCode("");
+            products.add(product);
 
-            TextView textView = new TextView(getContext());
-            textView.setText("Не найдено");
-            textView.setTypeface(typeface);
-            textView.setTextSize(18);
+            mIsLoading = false;
+            mIsLastPage = true;
+            mCurrentPage = mTotalPages;
 
-            linearLayout.post(() -> linearLayout.addView(textView));
-            scrollView.post(() -> scrollView.addView(linearLayout));
+            cursor.close();
+            cursor1.close();
+            db.close();
+
+            return products;
         }
+    }
 
-        cursor.close();
-        cursor1.close();
-        db.close();
+    private void loadFirstPage(final String pText) {
+        Log.d("Loading...", "loadFirstPage: ");
+        List<Product> products = search(pText, mCurrentPage);
+        mProgressBar.setVisibility(View.GONE);
+        mSearchAdapter.addAll(products);
+
+        Log.d("Products count", String.valueOf(mSearchAdapter.getItemCount()));
+        if (mCurrentPage < mTotalPages && mSearchAdapter.getItemCount() >= 15)
+            mSearchAdapter.addLoadingFooter();
+        else
+            mIsLastPage = true;
+    }
+
+    private void loadNextPage(final String pText) {
+        Log.d("Loading...", "loadNextPage: " + mCurrentPage);
+        List<Product> products = search(pText, mCurrentPage * 15);
+
+        mSearchAdapter.removeLoadingFooter();
+        mIsLoading = false;
+
+        mSearchAdapter.addAll(products);
+
+        if (mCurrentPage != mTotalPages)
+            mSearchAdapter.addLoadingFooter();
+        else
+            mIsLastPage = true;
     }
 
     @Override

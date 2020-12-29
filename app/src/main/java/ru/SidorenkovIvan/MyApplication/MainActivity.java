@@ -15,7 +15,6 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -26,13 +25,12 @@ import static androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String FRAGMENT_HOME = "home";
-    private static final String FRAGMENT_OTHER = "other";
-    private String name;
-    private String phone;
-    private BottomNavigationView navigationView;
+    private final String FRAGMENT_HOME = "home";
+    private final String FRAGMENT_OTHER = "other";
+    private BottomNavigationView mNavigationView;
+    private static ImageLoader mImageLoader;
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        setSupportActionBar((Toolbar)findViewById(R.id.custom_toolbar));
+        setSupportActionBar(findViewById(R.id.custom_toolbar));
 
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setOnNavigationItemSelectedListener(item -> {
+        mNavigationView = findViewById(R.id.nav_view);
+        mNavigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_home:
                     viewFragment(new HomeFragment(), FRAGMENT_HOME);
@@ -59,77 +57,61 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
+        initAlertDialog();
+        initImageLoader();
+    }
+
+    private void initImageLoader() {
+        mImageLoader = new ImageLoader(this);
+    }
+
+    public static ImageLoader getImageLoader() {
+        return mImageLoader;
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void initAlertDialog() {
         Button buttonPhoneCall = findViewById(R.id.button_call);
         buttonPhoneCall.setOnClickListener(v -> {
-            @SuppressLint("ResourceType") AlertDialog.Builder phone_call = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
+            AlertDialog.Builder phone_call = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
             View custom_back_call = getLayoutInflater().inflate(R.layout.phone_call, null);
             final AlertDialog dialog = phone_call.create();
 
+            initButtons(custom_back_call);
+
             Button close = custom_back_call.findViewById(R.id.button_back);
             close.setOnClickListener(v1 -> dialog.dismiss());
-
-            Button buttonSite = custom_back_call.findViewById(R.id.buttonSite);
-            buttonSite.setOnClickListener(q -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://tea4u.by"))));
-
-            Button buttonTextSite = custom_back_call.findViewById(R.id.buttonTextSite);
-            buttonTextSite.setOnClickListener(q -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://tea4u.by"))));
-
-            Button buttonVK = custom_back_call.findViewById(R.id.buttonVK);
-            buttonVK.setOnClickListener(b -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/tea4uby"))));
-
-            Button buttonVKText = custom_back_call.findViewById(R.id.buttonTextVK);
-            buttonVKText.setOnClickListener(b -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/tea4uby"))));
-
-            Button buttonInstagram = custom_back_call.findViewById(R.id.buttonInstagram);
-            buttonInstagram.setOnClickListener(b1 -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/tea4u.by"))));
-
-            Button buttonInstagramText = custom_back_call.findViewById(R.id.buttonTextInstagram);
-            buttonInstagramText.setOnClickListener(b1 -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/tea4u.by"))));
-
-            Button button = custom_back_call.findViewById(R.id.buttonCall);
-            button.setOnClickListener(i -> startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + getResources().getString(R.string.mtc_call)))));
-
-            Button buttonCall = custom_back_call.findViewById(R.id.buttonCallText);
-            buttonCall.setOnClickListener(i -> startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + getResources().getString(R.string.mtc_call)))));
-
-            Button buttonViber = custom_back_call.findViewById(R.id.buttonViber);
-            buttonViber.setOnClickListener(i -> startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + getResources().getString(R.string.viber_call)))));
-
-            Button buttonViberText = custom_back_call.findViewById(R.id.buttonViberText);
-            buttonViberText.setOnClickListener(i -> startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + getResources().getString(R.string.viber_call)))));
 
             Button next_page = custom_back_call.findViewById(R.id.button_back_call_view);
             next_page.setOnClickListener(v2 -> {
                 dialog.dismiss();
 
-                AlertDialog.Builder inputData = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
                 View input = getLayoutInflater().inflate(R.layout.phone_call_back, null);
-                final AlertDialog dialog1 = inputData.create();
+                final AlertDialog dialog1 = phone_call.create();
 
                 Button close1 = input.findViewById(R.id.button_input_back);
                 close1.setOnClickListener(v1 -> dialog1.dismiss());
 
-                EditText editTextPhone = input.findViewById(R.id.linearLayout3);
-                EditText editTextName = input.findViewById(R.id.linearLayout4);
+                EditText editTextPhone = input.findViewById(R.id.editTextPhone);
+                EditText editTextName = input.findViewById(R.id.editTextName);
 
                 Button final_page = input.findViewById(R.id.button_send_back_call);
                 final_page.setOnClickListener(v3 -> {
-                    phone = editTextPhone.getText().toString().trim();
-                    name = editTextName.getText().toString().trim();
+                    String phone = editTextPhone.getText().toString().trim();
+                    String name = editTextName.getText().toString().trim();
                     Log.i("My phone is ", phone + " - " + phone.length());
+                    Log.i("My name in form ", name);
 
                     if (phone.length() == 17 && !TextUtils.isEmpty(name)) {
-                        Log.i("My name in form ", name);
                         dialog1.dismiss();
 
-                        AlertDialog.Builder final_alert_dialog = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
                         View finalDialog = getLayoutInflater().inflate(R.layout.final_phone_call_back, null);
-                        final AlertDialog dialog2 = final_alert_dialog.create();
+                        final AlertDialog dialog2 = phone_call.create();
 
                         Button close2 = finalDialog.findViewById(R.id.button_input_back);
                         close2.setOnClickListener(v1 -> dialog2.dismiss());
 
-                        TextView textView = finalDialog.findViewById(R.id.textView2);
+                        TextView textView = finalDialog.findViewById(R.id.textViewName);
                         textView.setText("Спасибо, " + name + "." + "\n" + "Мы скоро Вам перезвоним");
 
                         Button ok = finalDialog.findViewById(R.id.button_end);
@@ -140,44 +122,97 @@ public class MainActivity extends AppCompatActivity {
                         dialog2.setView(finalDialog);
                         dialog2.show();
                     } else {
-                        Toast.makeText(this, "Your phone or name is incorrect", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Your phone or name is incorrect", Toast.LENGTH_SHORT).show();
                     }
                 });
+
                 dialog1.setView(input);
                 dialog1.show();
             });
+
             dialog.setView(custom_back_call);
             dialog.show();
         });
     }
 
-    private void sendEmail(String phone, String name) {
+    private void initButtons(final View pView) {
+        Button buttonSite = pView.findViewById(R.id.buttonSite);
+        Button buttonSiteT = pView.findViewById(R.id.buttonTextSite);
+        Button buttonVk = pView.findViewById(R.id.buttonVK);
+        Button buttonVkT = pView.findViewById(R.id.buttonTextVK);
+        Button buttonInstagram = pView.findViewById(R.id.buttonInstagram);
+        Button buttonInstagramT = pView.findViewById(R.id.buttonTextInstagram);
+        Button buttonCall = pView.findViewById(R.id.buttonCall);
+        Button buttonCallT = pView.findViewById(R.id.buttonCallText);
+        Button buttonViber = pView.findViewById(R.id.buttonViber);
+        Button buttonViberT = pView.findViewById(R.id.buttonViberText);
+
+        buttonSite.setOnClickListener(this::onClick);
+        buttonSiteT.setOnClickListener(this::onClick);
+        buttonVk.setOnClickListener(this::onClick);
+        buttonVkT.setOnClickListener(this::onClick);
+        buttonInstagram.setOnClickListener(this::onClick);
+        buttonInstagramT.setOnClickListener(this::onClick);
+        buttonCall.setOnClickListener(this::onClick);
+        buttonCallT.setOnClickListener(this::onClick);
+        buttonViber.setOnClickListener(this::onClick);
+        buttonViberT.setOnClickListener(this::onClick);
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    public void onClick(final View pView) {
+        switch (pView.getId()) {
+            case R.id.buttonSite:
+            case R.id.buttonTextSite:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://tea4u.by")));
+                break;
+            case R.id.buttonVK:
+            case R.id.buttonTextVK:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/tea4uby")));
+                break;
+            case R.id.buttonInstagram:
+            case R.id.buttonTextInstagram:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/tea4u.by")));
+                break;
+            case R.id.button_call:
+            case R.id.buttonCallText:
+                startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + getResources().getString(R.string.mtc_call))));
+                break;
+            case R.id.buttonViber:
+            case R.id.buttonViberText:
+                startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + getResources().getString(R.string.viber_call))));
+                break;
+        }
+    }
+
+    private void sendEmail(final String pPhone, final String pName) {
         String mail = "info@tea4u.by";
         String subject = "Обратный звонок от приложения";
-        String messageToEmail = "Телефон: " + phone + "\n" + "Имя: " + name;
+        String messageToEmail = "Телефон: " + pPhone + "\n" + "Имя: " + pName;
 
         JavaMailAPI javaMailAPI = new JavaMailAPI(this, mail, subject, messageToEmail);
         javaMailAPI.execute();
     }
 
-    private void viewFragment(Fragment fragment, String name){
+    private void viewFragment(final Fragment pFragment, final String pName) {
         final FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.replace(R.id.nav_host_fragment, pFragment);
+        fragmentTransaction.setReorderingAllowed(true);
 
         final int count = fragmentManager.getBackStackEntryCount();
-        if (name.equals(FRAGMENT_OTHER)) {
-            fragmentTransaction.addToBackStack(name);
+        if (pName.equals(FRAGMENT_OTHER)) {
+            fragmentTransaction.addToBackStack(pName);
         }
         fragmentTransaction.commit();
 
         fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                if( fragmentManager.getBackStackEntryCount() <= count){
+                if (fragmentManager.getBackStackEntryCount() <= count) {
                     fragmentManager.popBackStack(FRAGMENT_OTHER, POP_BACK_STACK_INCLUSIVE);
                     fragmentManager.removeOnBackStackChangedListener(this);
-                    navigationView.getMenu().getItem(0).setChecked(true);
+                    mNavigationView.getMenu().getItem(0).setChecked(true);
                 }
             }
         });

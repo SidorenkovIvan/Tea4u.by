@@ -17,19 +17,19 @@ import javax.mail.internet.MimeMessage;
 class JavaMailAPI extends AsyncTask<Void,Void,Void>  {
     //Variables
     @SuppressLint("StaticFieldLeak")
-    private Context mContext;
+    private final Context mContext;
 
-    private String mEmail;
-    private String mSubject;
-    private String mMessage;
+    private final String mEmail;
+    private final String mSubject;
+    private final String mMessage;
 
     private ProgressDialog mProgressDialog;
 
-    public JavaMailAPI(Context mContext, String mEmail, String mSubject, String mMessage) {
-        this.mContext = mContext;
-        this.mEmail = mEmail;
-        this.mSubject = mSubject;
-        this.mMessage = mMessage;
+    public JavaMailAPI(final Context pContext, final String pEmail, final String pSubject, final String pMessage) {
+        mContext = pContext;
+        mEmail = pEmail;
+        mSubject = pSubject;
+        mMessage = pMessage;
     }
 
     @Override
@@ -40,8 +40,8 @@ class JavaMailAPI extends AsyncTask<Void,Void,Void>  {
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
+    protected void onPostExecute(final Void pVoid) {
+        super.onPostExecute(pVoid);
         //Dismiss progress dialog when message successfully send
         mProgressDialog.dismiss();
 
@@ -50,7 +50,7 @@ class JavaMailAPI extends AsyncTask<Void,Void,Void>  {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Void doInBackground(final Void... pParams) {
         //Creating properties
         Properties props = new Properties();
 
@@ -95,6 +95,6 @@ class JavaMailAPI extends AsyncTask<Void,Void,Void>  {
 }
 
 class Config {
-    public static String EMAIL = "tea4u.by@gmail.com";
-    public static String PASSWORD = "cDeVDen5";
+    public static final String EMAIL = "tea4u.by@gmail.com";
+    public static final String PASSWORD = "cDeVDen5";
 }
