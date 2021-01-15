@@ -23,12 +23,12 @@
         app:layout_constraintVertical_bias="0.758" />
 
     <TextView
-        android:textSize="20sp"
+        android:textSize="@dimen/title_text_size"
         android:textColor="@color/textColor"
         android:id="@+id/textViewForProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/top_margin_l"
         android:text="@string/downloading_new_teas"
         android:fontFamily="@font/opensans"
         app:layout_constraintEnd_toEndOf="@+id/progressBarSplash"

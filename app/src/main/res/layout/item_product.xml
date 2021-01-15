@@ -13,7 +13,7 @@
         android:adjustViewBounds="true"
         android:background="@color/colorWhite"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/top_margin_l"
         android:contentDescription="@string/todo" />
 
     <TextView
