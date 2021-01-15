@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="ru.SidorenkovIvan.MyApplication.ui.home.HomeFragment"
+        android:name="ru.sidorenkovivan.myapplication.ui.home.HomeFragment"
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_nav_home_to_search"
@@ -22,8 +22,8 @@
 
     <fragment
         android:id="@+id/catalog"
-        android:name="ru.SidorenkovIvan.MyApplication.ui.Catalog.Catalog"
-        tools:layout="@layout/catalog_fragment" >
+        android:name="ru.sidorenkovivan.myapplication.ui.catalog.Catalog"
+        tools:layout="@layout/fragment_catalog" >
         <action
             android:id="@+id/action_catalog_to_categories"
             app:destination="@id/categories" />
@@ -31,8 +31,8 @@
 
     <fragment
         android:id="@+id/search"
-        android:name="ru.SidorenkovIvan.MyApplication.ui.Search.Search"
-        tools:layout="@layout/search_fragment" >
+        android:name="ru.sidorenkovivan.myapplication.ui.search.Search"
+        tools:layout="@layout/fragment_search" >
         <action
             android:id="@+id/action_search_to_pageOfProduct"
             app:destination="@id/pageOfProduct" />
@@ -40,8 +40,8 @@
 
     <fragment
         android:id="@+id/categories"
-        android:name="ru.SidorenkovIvan.MyApplication.ui.Categories.Categories"
-        tools:layout="@layout/categories_fragment" >
+        android:name="ru.sidorenkovivan.myapplication.ui.categories.Categories"
+        tools:layout="@layout/fragment_categories" >
         <action
             android:id="@+id/action_categories_to_pageOfProduct"
             app:destination="@id/pageOfProduct" />
@@ -49,7 +49,7 @@
 
     <fragment
         android:id="@+id/pageOfProduct"
-        android:name="ru.SidorenkovIvan.MyApplication.ui.ProductPage.ProductPage"
-        tools:layout="@layout/product_page_fragment" />
+        android:name="ru.sidorenkovivan.myapplication.ui.productpage.ProductPage"
+        tools:layout="@layout/fragment_product_page" />
 
 </navigation>
