@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="ru.sidorenkovivan.myapplication">
+    package="ru.sidorenkovivan.tea4uby">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
@@ -20,7 +21,7 @@
         tools:ignore="AllowBackup">
 
         <activity
-            android:name="ru.sidorenkovivan.myapplication.MainActivity"
+            android:name="ru.sidorenkovivan.tea4uby.MainActivity"
             android:label=""
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
@@ -31,7 +32,7 @@
         </activity>
 
         <activity
-            android:name="ru.sidorenkovivan.myapplication.SplashActivity">
+            android:name="ru.sidorenkovivan.tea4uby.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

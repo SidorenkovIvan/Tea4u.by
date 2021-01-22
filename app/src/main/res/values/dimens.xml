@@ -1,7 +1,7 @@
 <resources>
     <dimen name="top_margin_l">20dp</dimen>
     <dimen name="top_margin_s">10dp</dimen>
-    <dimen name="phone_call_text_size">14sp</dimen>
     <dimen name="phone_call_editText_size">12sp</dimen>
     <dimen name="title_text_size">20sp</dimen>
+    <dimen name="phone_call_text_size">14sp</dimen>
 </resources>

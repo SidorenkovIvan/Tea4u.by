@@ -1,193 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:background="@drawable/phone_call_background">
 
     <Button
-        android:id="@+id/button_back"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_gravity="start"
-        android:layout_marginTop="13dp"
-        android:layout_marginEnd="13dp"
-        android:background="@drawable/back"
+        style="@style/CustomBackButton"
+        android:id="@+id/buttonBack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/linearLayout7"
+        android:id="@+id/linearLayoutSite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="@+id/linearLayout5"
-        app:layout_constraintTop_toBottomOf="@+id/button_back">
+        app:layout_constraintStart_toStartOf="@+id/linearLayoutInstagram"
+        app:layout_constraintTop_toBottomOf="@+id/buttonBack">
 
         <Button
+            style="@style/CustomIcon"
             android:id="@+id/buttonSite"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center"
-            android:background="@drawable/tea4u_ava"
-            android:stateListAnimator="@null"
-            tools:ignore="ButtonStyle" />
+            android:background="@drawable/tea4u_ava" />
 
         <Button
+            style="@style/CustomIconsText"
             android:id="@+id/buttonTextSite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@color/colorWhite"
-            android:fontFamily="@font/opensans"
-            android:stateListAnimator="@null"
-            android:text="@string/instagram"
-            android:textAlignment="textStart"
-            android:textAllCaps="false"
-            android:textColor="@color/textColor"
-            android:textSize="@dimen/phone_call_text_size"
-            tools:ignore="ButtonStyle" />
-
+            android:text="@string/instagram" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout5"
+        android:id="@+id/linearLayoutInstagram"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="@+id/linearLayout6"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout7">
+        app:layout_constraintStart_toStartOf="@+id/linearLayoutVk"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutSite">
 
         <Button
+            style="@style/CustomIcon"
             android:id="@+id/buttonInstagram"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center"
-            android:background="@drawable/instagram"
-            android:stateListAnimator="@null"
-            tools:ignore="ButtonStyle" />
+            android:background="@drawable/instagram" />
 
         <Button
+            style="@style/CustomIconsText"
             android:id="@+id/buttonTextInstagram"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@color/colorWhite"
-            android:fontFamily="@font/opensans"
-            android:stateListAnimator="@null"
-            android:text="@string/instagram"
-            android:textAlignment="textStart"
-            android:textAllCaps="false"
-            android:textColor="@color/textColor"
-            android:textSize="@dimen/phone_call_text_size"
-            tools:ignore="ButtonStyle" />
-
-
+            android:text="@string/instagram" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout6"
+        android:id="@+id/linearLayoutVk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="@+id/linearLayout"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout5">
+        app:layout_constraintStart_toStartOf="@+id/linearLayoutCall"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutInstagram">
 
         <Button
+            style="@style/CustomIcon"
             android:id="@+id/buttonVK"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center"
-            android:background="@drawable/vk"
-            android:stateListAnimator="@null"
-            tools:ignore="ButtonStyle" />
+            android:background="@drawable/vk" />
 
         <Button
+            style="@style/CustomIconsText"
             android:id="@+id/buttonTextVK"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@color/colorWhite"
-            android:fontFamily="@font/opensans"
-            android:stateListAnimator="@null"
-            android:textAlignment="textStart"
-            android:text="@string/vk"
-            android:textAllCaps="false"
-            android:textColor="@color/textColor"
-            android:textSize="@dimen/phone_call_text_size"
-            tools:ignore="ButtonStyle" />
-
+            android:text="@string/vk" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/linearLayoutCall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout6">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutVk">
 
         <Button
+            style="@style/CustomIcon"
             android:id="@+id/buttonCall"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center"
-            android:background="@drawable/phone_call"
-            android:stateListAnimator="@null"
-            tools:ignore="ButtonStyle" />
+            android:background="@drawable/phone_call" />
 
         <Button
+            style="@style/CustomIconsText"
             android:id="@+id/buttonCallText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@color/colorWhite"
-            android:textAlignment="textStart"
-            android:fontFamily="@font/opensans"
-            android:lineSpacingExtra="5sp"
-            android:stateListAnimator="@null"
-            android:text="@string/mtc_call"
-            android:textColor="@color/textColor"
-            android:textSize="@dimen/phone_call_text_size"
-            tools:ignore="ButtonStyle" />
-
+            android:text="@string/mtc_call" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/linearLayoutViber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutCall">
 
         <Button
+            style="@style/CustomIcon"
             android:id="@+id/buttonViber"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center"
-            android:background="@drawable/viber_phone_call"
-            android:stateListAnimator="@null"
-            tools:ignore="ButtonStyle" />
+            android:background="@drawable/viber_phone_call" />
 
         <Button
+            style="@style/CustomIconsText"
             android:id="@+id/buttonViberText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@color/colorWhite"
-            android:fontFamily="@font/opensans"
-            android:lineSpacingExtra="5sp"
-            android:textAlignment="textStart"
-            android:stateListAnimator="@null"
-            android:text="@string/viber_call"
-            android:textColor="@color/textColor"
-            android:textSize="@dimen/phone_call_text_size"
-            tools:ignore="ButtonStyle" />
-
+            android:text="@string/viber_call" />
     </LinearLayout>
 
     <Button
-        android:id="@+id/button_back_call_view"
+        style="@style/CustomText"
+        android:id="@+id/buttonBackCallView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
@@ -195,17 +114,11 @@
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="34dp"
         android:background="@color/colorForSmallCategories"
-        android:fontFamily="@font/opensans"
         android:paddingHorizontal="19dp"
         android:stateListAnimator="@null"
         android:text="@string/back_call"
-        android:textAllCaps="false"
-        android:textColor="@color/textColor"
-        android:textSize="@dimen/phone_call_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
-
-
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutViber" />
 </androidx.constraintlayout.widget.ConstraintLayout>
