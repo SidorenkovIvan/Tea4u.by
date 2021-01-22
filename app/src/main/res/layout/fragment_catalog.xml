@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ru.sidorenkovivan.myapplication.ui.catalog.Catalog">
+    tools:context="ru.sidorenkovivan.tea4uby.ui.catalog.CatalogFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

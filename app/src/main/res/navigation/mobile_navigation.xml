@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="ru.sidorenkovivan.myapplication.ui.home.HomeFragment"
+        android:name="ru.sidorenkovivan.tea4uby.ui.home.HomeFragment"
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_nav_home_to_search"
@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/catalog"
-        android:name="ru.sidorenkovivan.myapplication.ui.catalog.Catalog"
+        android:name="ru.sidorenkovivan.tea4uby.ui.catalog.CatalogFragment"
         tools:layout="@layout/fragment_catalog" >
         <action
             android:id="@+id/action_catalog_to_categories"
@@ -31,7 +31,7 @@
 
     <fragment
         android:id="@+id/search"
-        android:name="ru.sidorenkovivan.myapplication.ui.search.Search"
+        android:name="ru.sidorenkovivan.tea4uby.ui.search.SearchFragment"
         tools:layout="@layout/fragment_search" >
         <action
             android:id="@+id/action_search_to_pageOfProduct"
@@ -40,7 +40,7 @@
 
     <fragment
         android:id="@+id/categories"
-        android:name="ru.sidorenkovivan.myapplication.ui.categories.Categories"
+        android:name="ru.sidorenkovivan.tea4uby.ui.categories.CategoriesFragment"
         tools:layout="@layout/fragment_categories" >
         <action
             android:id="@+id/action_categories_to_pageOfProduct"
@@ -49,7 +49,7 @@
 
     <fragment
         android:id="@+id/pageOfProduct"
-        android:name="ru.sidorenkovivan.myapplication.ui.productpage.ProductPage"
+        android:name="ru.sidorenkovivan.tea4uby.ui.productpage.ProductPageFragment"
         tools:layout="@layout/fragment_product_page" />
 
 </navigation>

@@ -89,7 +89,7 @@
 
                 <Button
                     style="@style/CustomText"
-                    android:id="@+id/buttonToSite"
+                    android:id="@+id/buttonToWebsite"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

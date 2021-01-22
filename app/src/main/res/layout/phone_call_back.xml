@@ -8,13 +8,8 @@
     android:background="@drawable/phone_call_background">
 
     <Button
-        android:id="@+id/button_input_back"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_gravity="start"
-        android:layout_marginTop="13dp"
-        android:layout_marginEnd="13dp"
-        android:background="@drawable/back"
+        style="@style/CustomBackButton"
+        android:id="@+id/buttonBackCall"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -29,9 +24,9 @@
         android:lineSpacingExtra="5sp"
         android:text="@string/phone_call_back"
         android:textSize="14sp"
-        app:layout_constraintEnd_toStartOf="@+id/button_input_back"
+        app:layout_constraintEnd_toStartOf="@+id/buttonBackCall"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_input_back" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonBackCall" />
 
     <TextView
         style="@style/CustomText"
@@ -94,7 +89,7 @@
 
     <Button
         style="@style/CustomText"
-        android:id="@+id/button_send_back_call"
+        android:id="@+id/buttonSendBackCall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/colorForSmallCategories"
